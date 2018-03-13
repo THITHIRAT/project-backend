@@ -42,7 +42,6 @@ router.post('/register', (req,res) => {
                     msg: 'there are some error with query'
                 });
             }else {
-                console.log(rows);
                 if(rows.length > 0) {
                     res.send({
                         msg: 'there are email to signup'
@@ -148,7 +147,7 @@ router.post('/logout', (req,res) => {
                 msg: 'there are some error with query'
             });
         } else {
-            if(rows.length == 1) {
+            if(rows.length > 0) {
                 var emaillogout = rows[0].email;
                 connection.query('UPDATE user SET token = null WHERE email = ?', emaillogout, function(err, rows) {
                     if(err) {
@@ -172,19 +171,30 @@ router.post('/logout', (req,res) => {
 });
 
 router.post('/resetpassword', (req,res) => {
-    var users = {
-        password: req.body.password,
-        newpassword: req.body.newpassword,
-        token: req.body.token,
-    }
+    var password = req.body.password;
+    var newpassword = req.body.newpassword;
+    var token = req.body.token;
+
+    console.log(token);
+
     connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
         if(err) {
             res.send({
-                msg: 'there are some error with query'
+                msg: 'there are some error with query select'
             });
         }else {
-            if(rows.length == 1) {
-                var dbpassword = rows[0].password;
+            if(rows.length > 0) {
+                connection.query('UPDATE user SET password = ? WHERE token = ?', [newpassword, token], function(err, rows) {
+                    if(err) {
+                        res.send({
+                            msg: 'there are some error with query update'
+                        });
+                    }else {
+                        res.send({
+                            msg: 'update new password'
+                        });
+                    }
+                });
             }else {
                 res.send({
                     msg: "don't have token"
