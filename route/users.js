@@ -175,7 +175,36 @@ router.post('/resetpassword', (req,res) => {
     var newpassword = req.body.newpassword;
     var token = req.body.token;
 
-    console.log(token);
+    connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+        if(err) {
+            res.send({
+                msg: 'there are some error with query select'
+            });
+        }else {
+            if(rows.length > 0) {
+                connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, token, password], function(err, rows) {
+                    if(err) {
+                        res.send({
+                            msg: 'there are some error with query update'
+                        });
+                    }else {
+                        res.send({
+                            msg: 'update new password'
+                        });
+                    }
+                });
+            }else {
+                res.send({
+                    msg: "don't have token"
+                });
+            }
+        }
+    });
+});
+
+router.post('/changeusername', (req,res) => {
+    var newusername = req.body.newusername;
+    var token = req.body.token; 
 
     connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
         if(err) {
@@ -184,14 +213,14 @@ router.post('/resetpassword', (req,res) => {
             });
         }else {
             if(rows.length > 0) {
-                connection.query('UPDATE user SET password = ? WHERE token = ?', [newpassword, token], function(err, rows) {
+                connection.query('UPDATE user SET username = ? WHERE token = ?', [newusername, token], function(err, rows) {
                     if(err) {
                         res.send({
                             msg: 'there are some error with query update'
                         });
                     }else {
                         res.send({
-                            msg: 'update new password'
+                            msg: 'update new username'
                         });
                     }
                 });
