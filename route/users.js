@@ -28,6 +28,8 @@ router.post('/register', (req,res) => {
     }
 
     var emailreg = req.body.email;
+    var password = req.body.password;
+    var confirmpassword = req.body.confirmpassword;
 
     var token = random.id();
 
@@ -54,15 +56,21 @@ router.post('/register', (req,res) => {
                                 msg: 'there are some error with query'
                             });
                         }else {
-                            connection.query('UPDATE user SET token = ? WHERE email = ?', [token, emailreg], function(err, rows) {
-                                res.json({
-                                    status: 200,
-                                    data: users,
-                                    msg: 'user register sucessfully',
-                                    token: token
+                            if(password == confirmpassword) {
+                                connection.query('UPDATE user SET token = ? WHERE email = ?', [token, emailreg], function(err, rows) {
+                                    res.json({
+                                        status: 200,
+                                        data: users,
+                                        msg: 'user register sucessfully',
+                                        token: token
+                                    });
+                                    console.log(users.username, users.password, users.email);
                                 });
-                                console.log(users.username, users.password, users.email);
-                            });
+                            }else {
+                                res.json({
+                                    msg: 'password not match'
+                                })
+                            }
                         }
                     });
                 }
