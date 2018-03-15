@@ -10,10 +10,13 @@ app.use(bodyParser.urlencoded({
 }));
 
 var user = require('./route/users.js');
-app.use('/users',user);
+app.use('/users', user);
 
 var addreminder = require('./route/addreminder.js');
-app.use('/addreminder',addreminder);
+app.use('/addreminder', addreminder);
+
+var place = require('./route/place.js');
+app.use('/place', place);
 
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
