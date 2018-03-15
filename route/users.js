@@ -21,16 +21,13 @@ router.use(bodyParser.urlencoded({
 router.post('/register', (req,res) => {
     // console.log(req.body);
     var now = new Date();
-    var users = {
+    var users_reg = {
         username: req.body.username,
         password: req.body.password,
         email: req.body.email
     }
 
-    var emailreg = req.body.email;
-    var password = req.body.password;
     var confirmpassword = req.body.confirmpassword;
-
     var token = random.id();
 
     if(
@@ -38,10 +35,11 @@ router.post('/register', (req,res) => {
         req.body.password && 
         req.body.email
     ) {
-        connection.query('SELECT * FROM user WHERE email = ?', [emailreg], function(err, rows) {
+        connection.query('SELECT * FROM user WHERE email = ?', [users_reg.email], function(err, rows) {
             if(err) {
                 res.send({
-                    msg: 'there are some error with query'
+                    status: 400,
+                    msg: 'there are some error with query select register'
                 });
             }else {
                 if(rows.length > 0) {
@@ -49,22 +47,22 @@ router.post('/register', (req,res) => {
                         msg: 'there are email to signup'
                     });
                 }else {
-                    connection.query('INSERT INTO user SET ?', users, function(err, rows) {
+                    connection.query('INSERT INTO user SET ?', users_reg, function(err, rows) {
                         if(err) {
                             res.json({
                                 status: 400,
-                                msg: 'there are some error with query'
+                                msg: 'there are some error with query insert register'
                             });
                         }else {
-                            if(password == confirmpassword) {
-                                connection.query('UPDATE user SET token = ? WHERE email = ?', [token, emailreg], function(err, rows) {
+                            if(users_reg.password == confirmpassword) {
+                                connection.query('UPDATE user SET token = ? WHERE email = ?', [token, users_reg.email], function(err, rows) {
                                     res.json({
                                         status: 200,
-                                        data: users,
+                                        data: users_reg,
                                         msg: 'user register sucessfully',
                                         token: token
                                     });
-                                    console.log(users.username, users.password, users.email);
+                                    console.log(users_reg.username, users_reg.password, users_reg.email);
                                 });
                             }else {
                                 res.json({
@@ -86,38 +84,38 @@ router.post('/register', (req,res) => {
 });
 
 router.post('/login', (req,res) => {
-    var users = {
+    var users_login = {
         email: req.body.email,
         password: req.body.password,
     }
-    console.log(users.email,users.password);
+    console.log(users_login.email, users_login.password);
     
     if(
-        users.email
-        && typeof users.email !== 'undefined'
-        && users.password
-        && typeof users.password !== 'undefined'
+        users_login.email
+        && typeof users_login.email !== 'undefined'
+        && users_login.password
+        && typeof users_login.password !== 'undefined'
     ){
-        var emaillogin = req.body.email;
-        var passwordlogin = req.body.password;
 
         var token = random.id();
 
-        connection.query('SELECT * FROM user WHERE email = ?', [emaillogin], function(err, rows) {
+        connection.query('SELECT * FROM user WHERE email = ?', [users_login.email], function(err, rows) {
             if(err) {
                 res.send({
-                    msg: 'there are some error with query'
+                    status: 400,
+                    msg: 'there are some error with query select login'
                 });
             }else {
                 if(rows.length > 0) { // have email account 
-                    connection.query('SELECT * FROM user WHERE email = ? AND password = ?', [emaillogin, passwordlogin], function(err, rows) {
+                    connection.query('SELECT * FROM user WHERE email = ? AND password = ?', [users_login.email, users_login.password], function(err, rows) {
                         if(err) {
                             res.send({
-                                msg: 'there are some error with query'
+                                status: 400,
+                                msg: 'there are some error with query select login'
                             });
                         }else {
                             if(rows.length > 0) {
-                                connection.query('UPDATE user SET token = ? WHERE email = ?', [token, emaillogin], function(err, rows) {
+                                connection.query('UPDATE user SET token = ? WHERE email = ?', [token, users_login.email], function(err, rows) {
                                     res.send({
                                         msg: 'success login',
                                         token: token
@@ -149,94 +147,122 @@ router.post('/login', (req,res) => {
 
 router.post('/logout', (req,res) => {
     var token = req.body.token;
-    connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
-        if(err) {
-            res.send({
-                msg: 'there are some error with query'
-            });
-        } else {
-            if(rows.length > 0) {
-                var emaillogout = rows[0].email;
-                connection.query('UPDATE user SET token = null WHERE email = ?', emaillogout, function(err, rows) {
-                    if(err) {
-                        res.send({
-                            msg: 'there are some error with query'
-                        });
-                    }else {
-                        res.send({
-                            data: emaillogout,
-                            msg: "log out complete"
-                        });
-                    }
-                });
-            }else {
+
+    if(token) {
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
                 res.send({
-                    msg: "cannot logout"
+                    status: 400,
+                    msg: 'there are some error with query'
                 });
+            } else {
+                if(rows.length > 0) {
+                    var emaillogout = rows[0].email;
+                    connection.query('UPDATE user SET token = null WHERE email = ?', emaillogout, function(err, rows) {
+                        if(err) {
+                            res.send({
+                                msg: 'there are some error with query'
+                            });
+                        }else {
+                            res.send({
+                                data: emaillogout,
+                                msg: "log out complete"
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        msg: "cannot logout"
+                    });
+                }
             }
-        }
-    });
+        });
+    }else {
+        res.send({
+            msg: 'permission denied'
+        });
+    }
 });
 
 router.post('/resetpassword', (req,res) => {
-    var password = req.body.password;
-    var newpassword = req.body.newpassword;
-    var token = req.body.token;
+    var users_resetpassword = {
+        password: req.body.password,
+        token: req.body.token
+    }
 
-    connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
-        if(err) {
-            res.send({
-                msg: 'there are some error with query select'
-            });
-        }else {
-            if(rows.length > 0) {
-                connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, token, password], function(err, rows) {
-                    if(err) {
-                        res.send({
-                            msg: 'there are some error with query update'
-                        });
-                    }else {
-                        res.send({
-                            msg: 'update new password'
-                        });
-                    }
+    var newpassword = req.body.newpassword;
+
+    if(
+        users_resetpassword.password
+        && users_resetpassword.token
+    ){
+        connection.query('SELECT * FROM user WHERE token = ?', users_resetpassword.token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select'
                 });
             }else {
-                res.send({
-                    msg: "don't have token"
-                });
+                if(rows.length > 0) {
+                    connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, users_resetpassword.token, users_resetpassword.password], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                msg: 'there are some error with query update'
+                            });
+                        }else {
+                            res.send({
+                                msg: 'update new password'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        msg: "don't have token"
+                    });
+                }
             }
-        }
-    });
+        });
+    }else {
+        res.send({
+            msg: "permission deined"
+        });
+    }
 });
 
 router.post('/changeusername', (req,res) => {
     var newusername = req.body.newusername;
-    var token = req.body.token; 
+    var token = req.body.token;
 
-    connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
-        if(err) {
-            res.send({
-                msg: 'there are some error with query select'
-            });
-        }else {
-            if(rows.length > 0) {
-                connection.query('UPDATE user SET username = ? WHERE token = ?', [newusername, token], function(err, rows) {
-                    if(err) {
-                        res.send({
-                            msg: 'there are some error with query update'
-                        });
-                    }else {
-                        res.send({
-                            msg: 'update new username'
-                        });
-                    }
+    if(token){
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select'
                 });
             }else {
-                res.send({
-                    msg: "don't have token"
-                });
+                if(rows.length > 0) {
+                    connection.query('UPDATE user SET username = ? WHERE token = ?', [newusername, token], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                msg: 'there are some error with query update'
+                            });
+                        }else {
+                            res.send({
+                                msg: 'update new username'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        msg: "don't have token"
+                    });
+                }
             }
-        }
-    });
+        });
+    }else {
+        res.send({
+            msg: "permission denied"
+        });
+    }
 });

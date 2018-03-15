@@ -13,7 +13,7 @@ var user = require('./route/users.js');
 app.use('/users',user);
 
 var addreminder = require('./route/addreminder.js');
-app.use('/addreminder',user);
+app.use('/addreminder',addreminder);
 
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
