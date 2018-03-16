@@ -49,3 +49,33 @@ router.post('/location', (req,res) => {
         });
     }
 });
+
+router.post('/search', (req,res) => {
+    var txt_serach = req.body.txt;
+
+    if(txt_serach) {
+        connection.query(`SELECT * FROM place WHERE name LIKE '%` + txt_serach + `%'`, function(err, rows) {
+            if(err) { 
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select search'
+                });
+            }else {
+                if(rows.length > 0) {
+                    res.send({
+                        data: rows,
+                        msg: 'txt have some row'
+                    });
+                }else {
+                    res.send({
+                        msg: 'every rows dont have txt'
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            msg: "permission denied"
+        });
+    }
+});
