@@ -21,9 +21,8 @@ router.use(bodyParser.urlencoded({
 router.post('/location', (req,res) => {
     var reminder_location = {
         type: req.body.type,
+        notification: req.body.notification,
         placename: req.body.placename,
-        latitude: req.body.latitude,
-        longtitude: req.body.longtitude,
         taskname: req.body.taskname,
         complete: req.body.complete
     }
@@ -33,31 +32,48 @@ router.post('/location', (req,res) => {
     if(
         reminder_location.type
         && reminder_location.placename
-        && reminder_location.latitude
-        && reminder_location.longtitude
+        && reminder_location.notification
         && token
     ){
-        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+        connection.query('SELECT * FROM place WHERE name = ?', reminder_location.placename, function(err, rows) {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select add reminder location'
+                    msg: 'there are some error with query select location'
                 });
             }else {
-                console.log("id : " + rows[0]._id);
-                var id = rows[0]._id;
-                connection.query('INSERT INTO reminder (user_id, type, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_location.type + '", "' + reminder_location.placename + '", "' + reminder_location.latitude + '", "'  + reminder_location.longtitude + '", "' + reminder_location.taskname + '", "' + reminder_location.complete + '") ', function(err, rows) {
-                    if(err) {
-                        res.send({
-                            status: 400,
-                            msg: 'there are some error with query insert add reminder location'
-                        });
-                    }else {
-                        res.send({
-                            msg: 'insert location reminder'
-                        });
-                    }
-                });
+                if(rows.length <= 0) {
+                    res.send({
+                        status: 404,
+                        msg: 'can not find place'
+                    });
+                }else {
+                    var longtitude = rows[0].longtitude;
+                    var latitude = rows[0].latitude;
+                    connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'there are some error with query select add reminder location'
+                            });
+                        }else {
+                            console.log("id : " + rows[0]._id);
+                            var id = rows[0]._id;
+                            connection.query('INSERT INTO reminder (user_id, type, notification, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_location.type + '", "' + reminder_location.notification + '", "' + reminder_location.placename + '", "' + latitude + '", "'  + longtitude + '", "' + reminder_location.taskname + '", "' + reminder_location.complete + '") ', function(err, rows) {
+                                if(err) {
+                                    res.send({
+                                        status: 400,
+                                        msg: 'there are some error with query insert add reminder location'
+                                    });
+                                }else {
+                                    res.send({
+                                        msg: 'insert location reminder'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
     }else {
