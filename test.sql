@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 19, 2018 at 07:19 AM
+-- Generation Time: Mar 19, 2018 at 06:16 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -81,7 +81,16 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (22, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (23, 'Mega Bangna', 100.67980709999999, 13.648608300000001),
 (24, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
-(25, 'Phuket', 98.3922504, 7.8804479);
+(25, 'Phuket', 98.3922504, 7.8804479),
+(26, 'Chon Buri', 100.98467169999999, 13.361143099999998),
+(27, 'Thailand', 100.99254099999999, 15.870032000000002),
+(28, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
+(29, 'The Paseo Mall', 100.72717999999999, 13.721851999999998),
+(30, 'Central Library, King Mongkut\'s Institute of Technology Ladkraba', 100.7787895, 13.727696300000002),
+(31, 'KMITL Student Dormitory', 100.77437359999999, 13.7295935),
+(32, 'Central World', 100.53981879999999, 13.7462276),
+(33, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
+(34, 'Bangkok', 100.5017651, 13.7563309);
 
 -- --------------------------------------------------------
 
@@ -106,14 +115,25 @@ CREATE TABLE `reminder` (
 --
 
 INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`) VALUES
-(17, 49, 'location', 'pass', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 0),
+(17, 49, 'location', 'pass', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
 (18, 49, 'location', 'depart', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 0),
-(19, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 0),
-(20, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 0),
-(21, 27, 'location', 'Arrive', 'Ko Samui', 9.5120168, 100.01359289999999, 'travel', 0),
-(22, 27, 'location', 'Arrive', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'study', 0),
-(23, 27, 'location', 'Arrive', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', 0),
-(24, 27, 'location', 'Depart', 'Phuket', 7.8804479, 98.3922504, 'work', 0);
+(19, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
+(20, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
+(21, 27, 'location', 'Arrive', 'Ko Samui', 9.5120168, 100.01359289999999, 'travel', 1),
+(22, 27, 'location', 'Arrive', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'study', 1),
+(23, 27, 'location', 'Arrive', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', 1),
+(24, 27, 'location', 'Depart', 'Phuket', 7.8804479, 98.3922504, 'work', 1),
+(25, 27, 'location', 'Depart', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'hello', 1),
+(26, 27, 'location', 'Pass', 'Thailand', 15.870032000000002, 100.99254099999999, 'work', 1),
+(27, 27, 'location', 'Depart', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'sleep', 1),
+(28, 49, 'location', 'arrive', 'Ko Samui', 9.5120168, 100.01359289999999, 'Study', 1),
+(29, 49, 'location', 'pass', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
+(30, 49, 'location', 'pass', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
+(31, 27, 'location', 'Arrive', 'The Paseo Mall', 13.721851999999998, 100.72717999999999, 'shopping', 1),
+(32, 27, 'location', 'Arrive', 'KMITL Student Dormitory', 13.7295935, 100.77437359999999, 'sleep', 1),
+(33, 27, 'location', 'Depart', 'Central World', 13.7462276, 100.53981879999999, 'hello', 1),
+(34, 27, 'location', 'Arrive', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'study', 1),
+(35, 27, 'location', 'Depart', 'Bangkok', 13.7563309, 100.5017651, 'hello', 1);
 
 -- --------------------------------------------------------
 
@@ -138,7 +158,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', 'xXkNeTHw8Gi6yhKh5'),
+(27, 'test', 'test1234', 'test1234@test.com', 'D8hDwPDZCu8r7hFwq'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -217,12 +237,12 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 --
 -- AUTO_INCREMENT for table `user`
 --
