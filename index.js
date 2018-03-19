@@ -24,6 +24,9 @@ app.use('/admin', admin);
 var task = require('./route/task.js');
 app.use('/task', task);
 
+var complete = require('./route/complete.js');
+app.use('/complete', complete);
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });

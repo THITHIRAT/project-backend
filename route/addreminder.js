@@ -69,6 +69,7 @@ router.post('/location', (req,res) => {
                                     res.send({
                                         msg: 'insert location reminder'
                                     });
+                                    console.log('location');
                                 }
                             });
                         }
