@@ -32,7 +32,7 @@ router.post('/location', (req,res) => {
                 if(rows.length > 0) {
                     var id = rows[0]._id;
                     var complete = 0;
-                    connection.query('SELECT * FROM reminder WHERE user_id = ? AND complete = ?', [id,complete], function(err, rows) {
+                    connection.query('SELECT _id, user_id, type, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ?', [id,complete], function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,
