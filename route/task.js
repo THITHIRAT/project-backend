@@ -61,26 +61,3 @@ router.post('/location', (req,res) => {
         });
     }
 });
-
-router.post('/map', (req,res) => {
-    var token = req.body.token;
-    var complete = 0;
-
-    if(token) {
-        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
-            if(err) {
-                res.send({
-                    status: 400,
-                    msg: 'there are some error with query select map location'
-                });
-            }else {
-                
-            }
-        });
-    }else {
-        res.send({
-            status: 403,
-            msg: "permission denied"
-        });
-    }
-});

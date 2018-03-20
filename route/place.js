@@ -30,19 +30,34 @@ router.post('/location', (req,res) => {
         && place.latitude
         && place.longtitude
     ){
-        connection.query('INSERT INTO place SET ?', place, function(err, rows) {
+        connection.query('SELECT * FROM place WHERE name = ?', place.name, function(err, rows) {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query insert location'
+                    msg: 'there are some error with query select location'
                 });
             }else {
-                console.log(place);
-                res.send({
-                    msg: 'sucess insert location'
-                });
+                if(rows.length > 0) {
+                    res.send({
+                        msg: 'insert location already'
+                    });
+                }else {
+                    connection.query('INSERT INTO place SET ?', place, function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'there are some error with query insert location'
+                            });
+                        }else {
+                            console.log(place);
+                            res.send({
+                                msg: 'sucess insert location'
+                            });
+                        }
+                    });
+                }
             }
-        });
+        });   
     }else {
         res.send({
             msg: "permission denied"
