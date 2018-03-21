@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 19, 2018 at 06:16 PM
+-- Generation Time: Mar 21, 2018 at 05:12 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -45,6 +45,27 @@ INSERT INTO `admin` (`_id`, `email`, `password`, `privilege`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `notification`
+--
+
+CREATE TABLE `notification` (
+  `_id` int(255) NOT NULL,
+  `reminder_id` int(255) NOT NULL,
+  `time` time NOT NULL,
+  `date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `notification`
+--
+
+INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`) VALUES
+(13, 214, '21:12:00', '2560-03-15'),
+(14, 215, '21:12:00', '2560-03-15');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `place`
 --
 
@@ -60,7 +81,6 @@ CREATE TABLE `place` (
 --
 
 INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
-(2, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (3, 'California', -119.41793240000001, 36.778261),
 (4, 'Buri Ram', 103.1029191, 14.993001699999999),
 (5, 'Thamasat Rangsit Finance Faculty', 100.6036818, 14.0682048),
@@ -71,26 +91,23 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (10, 'Emmanuelle Entertainment Co.,Ltd.', 100.57294710000001, 13.7767626),
 (12, 'Seacon Square', 100.6481189, 13.6939777),
 (14, 'Khoonsin', 100.7527461, 13.722590099999998),
-(15, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
-(16, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (17, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (18, 'Pattaya City', 100.8824551, 12.9235557),
 (19, 'Faculty of Agricultural Technology King Mongkut\'s Institute of T', 100.78079149999999, 13.726566799999997),
 (20, 'Ko Samui', 100.01359289999999, 9.5120168),
 (21, 'Spain', -3.7492199999999998, 40.46366700000001),
-(22, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (23, 'Mega Bangna', 100.67980709999999, 13.648608300000001),
-(24, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (25, 'Phuket', 98.3922504, 7.8804479),
 (26, 'Chon Buri', 100.98467169999999, 13.361143099999998),
 (27, 'Thailand', 100.99254099999999, 15.870032000000002),
-(28, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
 (29, 'The Paseo Mall', 100.72717999999999, 13.721851999999998),
 (30, 'Central Library, King Mongkut\'s Institute of Technology Ladkraba', 100.7787895, 13.727696300000002),
 (31, 'KMITL Student Dormitory', 100.77437359999999, 13.7295935),
 (32, 'Central World', 100.53981879999999, 13.7462276),
-(33, 'KMITL Faculty of Engineering Office', 100.7763884, 13.7269923),
-(34, 'Bangkok', 100.5017651, 13.7563309);
+(34, 'Bangkok', 100.5017651, 13.7563309),
+(39, 'Siam Center', 100.53286349999999, 13.746252399999998),
+(40, '33/147 Suwinthawong 34 Soi 4', 100.78772479999999, 13.8052674),
+(41, 'Lopburi', 100.6533706, 14.799508099999997);
 
 -- --------------------------------------------------------
 
@@ -101,8 +118,13 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 CREATE TABLE `reminder` (
   `_id` int(255) NOT NULL,
   `user_id` int(255) NOT NULL,
-  `type` varchar(10) NOT NULL,
+  `type` varchar(10) DEFAULT NULL,
   `notification` varchar(10) NOT NULL,
+  `allday` int(1) DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
   `placename` varchar(64) NOT NULL,
   `latitude` double NOT NULL,
   `longtitude` double NOT NULL,
@@ -114,26 +136,9 @@ CREATE TABLE `reminder` (
 -- Dumping data for table `reminder`
 --
 
-INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`) VALUES
-(17, 49, 'location', 'pass', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
-(18, 49, 'location', 'depart', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 0),
-(19, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
-(20, 49, 'location', 'arrive', 'Seacon Square', 13.6939777, 100.6481189, 'Study', 1),
-(21, 27, 'location', 'Arrive', 'Ko Samui', 9.5120168, 100.01359289999999, 'travel', 1),
-(22, 27, 'location', 'Arrive', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'study', 1),
-(23, 27, 'location', 'Arrive', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', 1),
-(24, 27, 'location', 'Depart', 'Phuket', 7.8804479, 98.3922504, 'work', 1),
-(25, 27, 'location', 'Depart', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'hello', 1),
-(26, 27, 'location', 'Pass', 'Thailand', 15.870032000000002, 100.99254099999999, 'work', 1),
-(27, 27, 'location', 'Depart', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'sleep', 1),
-(28, 49, 'location', 'arrive', 'Ko Samui', 9.5120168, 100.01359289999999, 'Study', 1),
-(29, 49, 'location', 'pass', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
-(30, 49, 'location', 'pass', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
-(31, 27, 'location', 'Arrive', 'The Paseo Mall', 13.721851999999998, 100.72717999999999, 'shopping', 1),
-(32, 27, 'location', 'Arrive', 'KMITL Student Dormitory', 13.7295935, 100.77437359999999, 'sleep', 1),
-(33, 27, 'location', 'Depart', 'Central World', 13.7462276, 100.53981879999999, 'hello', 1),
-(34, 27, 'location', 'Arrive', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'study', 1),
-(35, 27, 'location', 'Depart', 'Bangkok', 13.7563309, 100.5017651, 'hello', 1);
+INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`) VALUES
+(214, 49, 'Event', '', 1, '2560-02-20', '2560-11-12', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learn', 0),
+(215, 49, 'Event', '', 1, '2560-02-20', '2560-11-12', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learn', 0);
 
 -- --------------------------------------------------------
 
@@ -158,7 +163,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', 'D8hDwPDZCu8r7hFwq'),
+(27, 'test', 'test1234', 'test1234@test.com', '87EvystRC5MFSKQKR'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -207,6 +212,12 @@ ALTER TABLE `admin`
   ADD PRIMARY KEY (`_id`);
 
 --
+-- Indexes for table `notification`
+--
+ALTER TABLE `notification`
+  ADD PRIMARY KEY (`_id`);
+
+--
 -- Indexes for table `place`
 --
 ALTER TABLE `place`
@@ -234,15 +245,20 @@ ALTER TABLE `user`
 ALTER TABLE `admin`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
+-- AUTO_INCREMENT for table `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+--
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 --
 -- AUTO_INCREMENT for table `user`
 --

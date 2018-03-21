@@ -401,12 +401,12 @@ router.post('/event', (req,res) => {
                             && reminder_event.endyear 
                         ){
                             var int_startmonth = parseInt(reminder_event.startmonth) - 1;
-                            var int_startyear = "20" + reminder_event.startyear;
+                            var int_startyear =  reminder_event.startyear;
                             var start = new Date(int_startyear, int_startmonth, reminder_event.startdate);
                             var startdate = start.toLocaleDateString();
 
                             var int_endmonth = parseInt(reminder_event.endmonth) - 1;
-                            var int_endyear = "20" + reminder_event.endyear;
+                            var int_endyear = reminder_event.endyear;
                             var end = new Date(int_endyear, int_endmonth, reminder_event.enddate);
                             var enddate = end.toLocaleDateString();
 
@@ -426,7 +426,7 @@ router.post('/event', (req,res) => {
                                         && req.body.allday_hrs
                                         && req.body.allday_mins
                                     ){
-                                        var int_year = "20" + req.body.allday_year;
+                                        var int_year = req.body.allday_year;
                                         var int_month = parseInt(req.body.allday_month) - 1;
                                         var date_time_notification_table = new Date(int_year, int_month, req.body.allday_date, req.body.allday_hrs, req.body.allday_mins, 0, 0);
                                         date_notification_table = date_time_notification_table.toLocaleDateString();
