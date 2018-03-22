@@ -24,6 +24,9 @@ app.use('/admin', admin);
 var task = require('./route/task.js');
 app.use('/task', task);
 
+var taskcomplete = require('./route/taskcomplete.js');
+app.use('/taskcomplete', taskcomplete);
+
 var complete = require('./route/complete.js');
 app.use('/complete', complete);
 

@@ -164,7 +164,7 @@ router.post('/event', (req,res) => {
                 if(rows.length > 0) {
                     console.log("user_id : " + rows[0]._id);
                     var id = rows[0]._id;
-                    if(reminder_event.allday == 0) {
+                    if(reminder_event.allday == "0") {
                         if(
                             reminder_event.starthour 
                             && reminder_event.startmin
@@ -391,7 +391,7 @@ router.post('/event', (req,res) => {
                             });
                         }
                     }
-                    if(reminder_event.allday == 1) {
+                    if(reminder_event.allday == "1") {
                         if(
                             reminder_event.startdate
                             && reminder_event.startmonth
@@ -400,6 +400,7 @@ router.post('/event', (req,res) => {
                             && reminder_event.endmonth
                             && reminder_event.endyear 
                         ){
+                            console.log("addreminder/event " + token);
                             var int_startmonth = parseInt(reminder_event.startmonth) - 1;
                             var int_startyear =  reminder_event.startyear;
                             var start = new Date(int_startyear, int_startmonth, reminder_event.startdate);
@@ -467,6 +468,8 @@ router.post('/event', (req,res) => {
             }
         });
     }else {
-
+        res.send({
+            msg: 'addreminder event : date not enough'
+        });
     }
 });
