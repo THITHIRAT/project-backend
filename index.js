@@ -30,6 +30,9 @@ app.use('/taskcomplete', taskcomplete);
 var complete = require('./route/complete.js');
 app.use('/complete', complete);
 
+var incomplete = require('./route/incomplete.js');
+app.use('/incomplete', incomplete);
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });

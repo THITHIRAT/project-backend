@@ -19,5 +19,5 @@ router.use(bodyParser.urlencoded({
 }));
 
 router.post('/location', (req,res) => {
-    var token = req.body.token;
+
 });
