@@ -16,5 +16,13 @@
     "meteor-random": "0.0.3",
     "mysql": "^2.15.0",
     "nodemon": "^1.14.12"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/THITHIRAT/project-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/THITHIRAT/project-backend/issues"
+  },
+  "homepage": "https://github.com/THITHIRAT/project-backend#readme"
 }
