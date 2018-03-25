@@ -73,3 +73,7 @@ router.post('/location', (req,res) => {
         });
     }
 });
+
+router.post('/event', (req,res) => {
+
+});

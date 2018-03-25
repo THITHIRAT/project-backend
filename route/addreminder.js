@@ -474,3 +474,7 @@ router.post('/event', (req,res) => {
         });
     }
 });
+
+router.post('/reminder', (req,res) => {
+
+});
