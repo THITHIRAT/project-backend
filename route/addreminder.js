@@ -19,6 +19,68 @@ router.use(bodyParser.urlencoded({
     extended : false
 }));
 
+function count_milliseconds(start, end, before_after, num, type){
+    var msec_start = start.getTime();
+    var msec_end = end.getTime();
+
+    console.log("Start Date : " + start + "\nEnd Date : " + end + "\nMSEC Start Date : \n" + msec_start + "\nMSEC End Date : " + msec_start + "\n" + before_after, num, type);
+
+    var temp = 0;
+    if(type == "Mins") {
+        temp = parseInt(num) * 60 * 1000;
+    }
+    else if(type == "Hrs") {
+        temp = parseInt(num) * 60 * 60 * 1000;
+    }
+    else if(type == "Days") {
+        temp = parseInt(num) * 24 * 60 * 60 * 1000;
+    }
+    else if(type == "Mths") {
+        console.log("Start Date : " + (start.getMonth() + 1));
+        var loop = parseInt(num);
+        for(var i=0; i<loop; i++) {
+            var num_month = start.getMonth();
+            if(num_month == 0 || num_month == 2 || num_month == 4 || num_month == 6 || num_month == 7 || num_month == 9 || num_month == 11) {
+                temp = temp + 2678400000;
+                num_month++;
+            }
+            else if(num_month == 3 || num_month == 5 || num_month == 8 || num_month == 10) {
+                temp = 2592000000;
+                num_month;
+            }
+            else if(num_month == 1) {
+                if((start.getFullYear() + 1)%4 == 0) {
+                    temp = temp + 2505600000;
+                    num_month++;
+                }else {
+                    temp = temp + 2419200000;
+                    num_month++;
+                }
+            }
+        }
+    }
+    else if(type == "Yrs") {
+        if((start.getFullYear() +1)%4 == 0) {
+            temp = temp + 31622400000;
+        }else {
+            temp = temp + 31536000000;
+        }
+    }
+
+    var notification;
+
+    if(before_after == "Before") {
+        notification = msec_start - temp;
+    }
+    else if(before_after == "After") {
+        notification = msec_start + temp;
+    }
+
+    var notification_date = new Date(notification);
+    console.log("Notification Date : " + notification_date);
+    return notification_date;
+}
+
 router.post('/location', (req,res) => {
     var reminder_location = {
         type: req.body.type,
@@ -120,8 +182,7 @@ router.post('/event', (req,res) => {
 
     var longtitude, latitude;
     var reminder_id;
-    var date_notification_table;
-    var time_notification_table;
+    var date_notification_table, time_notification_table;
 
     if(
         token
@@ -152,7 +213,6 @@ router.post('/event', (req,res) => {
                     longtitude = null;
                 }
                 console.log("Place name : " + reminder_event.placename + " \nLatitude : " + latitude + " && Longtitude : " + longtitude);
-        
             }
         });
         connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
@@ -179,19 +239,16 @@ router.post('/event', (req,res) => {
                             && reminder_event.endyear 
                         ){
                             var int_startmonth = parseInt(reminder_event.startmonth) - 1;
-                            var int_startyear = "20" + reminder_event.startyear;
+                            var int_startyear = reminder_event.startyear;
                             var start = new Date(int_startyear, int_startmonth, reminder_event.startdate, reminder_event.starthour, reminder_event.startmin);
                             var startdate = start.toLocaleDateString();
                             var starttime = start.toLocaleTimeString();
 
                             var int_endmonth = parseInt(reminder_event.endmonth) - 1;
-                            var int_endyear = "20" + reminder_event.endyear;
+                            var int_endyear = reminder_event.endyear;
                             var end = new Date(int_endyear, int_endmonth, reminder_event.enddate, reminder_event.endhour, reminder_event.endmin);
                             var enddate = end.toLocaleDateString();
                             var endtime = end.toLocaleTimeString();
-
-                            console.log("StartDate : " + startdate + "\nEndDate : " + enddate);
-                            console.log("StartTime : " + starttime + "\nEndTime : " + endtime);
                             
                             connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
                                 if(err) {
@@ -207,176 +264,26 @@ router.post('/event', (req,res) => {
                                         && notification_datetime.num_notification
                                         && notification_datetime.type_num
                                     ){
-                                        if(notification_datetime.before_after == "Before") {
-                                            var num = parseInt(notification_datetime.num_notification);
-                                            var time = (parseInt(start.getFullYear()) * 12 * 30 * 24 * 60) + parseInt((start.getMonth()+1) * 30 * 24 * 60) + (parseInt(start.getDate()) * 24 * 60) + (parseInt(start.getHours()) * 60) + (parseInt(start.getMinutes()));
-                                            
-                                            if(notification_datetime.type_num == "Mins") {
-                                                var time_notification = time - num;
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-    
-                                                console.log("Before Mins : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, month_notification, date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else if(notification_datetime.type_num == "Hrs") {
-                                                var time_notification = time - (num * 60);
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-    
-                                                console.log("Before Hrs : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, month_notification, date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else if(notification_datetime.type_num == "Days") {
-                                                var time_notification = time - (num * 60 * 24);
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-                                        
-                                                console.log("Before Days : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, month_notification, date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else {
+                                        var num = parseInt(notification_datetime.num_notification);
+
+                                        var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
+
+                                        var time_notification_table = notification_date.toLocaleTimeString();
+                                        var date_notification_table = notification_date.toLocaleDateString();
+
+                                        connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
+                                            if(err) {
                                                 res.send({
                                                     status: 400,
-                                                    msg: 'allday = 0 : dont have days hrs mins'
+                                                    msg: 'allday = 0 : there are some error with insert notification'
                                                 });
-                                            }
-                                            connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
-                                                console.log(time_notification_table + " " + date_notification_table);
-                                                if(err) {
-                                                    res.send({
-                                                        status: 400,
-                                                        msg: 'allday = 0 : there are some error with insert notification'
-                                                    });
-                                                }else {
-                                                    res.send({
-                                                        status: 200,
-                                                        msg: 'allday = 0 : insert notification success'
-                                                    });
-                                                }
-                                            });
-                                        }
-                                        if(notification_datetime.before_after == "After") {
-                                            var num = parseInt(notification_datetime.num_notification);
-                                            var time = (parseInt(start.getFullYear()) * 12 * 30 * 24 * 60) + parseInt((start.getMonth()+1) * 30 * 24 * 60) + (parseInt(start.getDate()) * 24 * 60) + (parseInt(start.getHours()) * 60) + (parseInt(start.getMinutes()));
-                                            
-                                            if(notification_datetime.type_num == "Mins") {
-                                                var time_notification = time + num;
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-    
-                                                console.log("Before Mins : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, (month_notification-1), date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else if(notification_datetime.type_num == "Hrs") {
-                                                var time_notification = time + (num * 60);
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-    
-                                                console.log("Before Hrs : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, (month_notification-1), date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else if(notification_datetime.type_num == "Days") {
-                                                var time_notification = time + (num * 60 * 24);
-    
-                                                var year_notification = Math.floor(time_notification/(12*30*24*60));
-                                                var mod_year_notification = time_notification%(12*30*24*60);
-    
-                                                var month_notification = Math.floor(mod_year_notification/(30*24*60));
-                                                var mod_month_notification = mod_year_notification%(30*24*60);
-    
-                                                var date_notification = Math.floor(mod_month_notification/(24*60));
-                                                var mod_date_notification = mod_month_notification%(24*60);
-    
-                                                var hour_notification = Math.floor(mod_date_notification/60);
-                                                var min_notification = mod_date_notification % 60;
-                                        
-                                                console.log("Before Days : " + num + "\nTime : " + date_notification + "/" + month_notification + "/" + year_notification + " " + hour_notification + ":" + min_notification);
-                                                var date_time_notification_table = new Date(year_notification, (month_notification-1), date_notification, hour_notification, min_notification, 0, 0);
-                                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                            }
-                                            else {
+                                            }else {
                                                 res.send({
-                                                    status: 400,
-                                                    msg: 'allday = 0 : dont have days hrs mins'
+                                                    status: 200,
+                                                    msg: 'allday = 0 : insert notification success'
                                                 });
                                             }
-                                            connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
-                                                console.log(time_notification_table + " " + date_notification_table);
-                                                if(err) {
-                                                    res.send({
-                                                        status: 400,
-                                                        msg: 'allday = 0 : there are some error with insert notification'
-                                                    });
-                                                }else {
-                                                    res.send({
-                                                        status: 200,
-                                                        msg: 'allday = 0 : insert notification success'
-                                                    });
-                                                }
-                                            });
-                                        }
+                                        });
                                     }else {
                                         res.send({
                                             status: 400,
@@ -476,5 +383,301 @@ router.post('/event', (req,res) => {
 });
 
 router.post('/reminder', (req,res) => {
+    var reminder_reminder = {
+        type: req.body.type,
+        allday: req.body.allday,
+        startdate: req.body.startdate,
+        startmonth: req.body.startmonth,
+        startyear: req.body.startyear,
+        enddate: req.body.enddate,
+        endmonth: req.body.endmonth,
+        endyear: req.body.endyear,
+        starthour: req.body.starthour,
+        startmin: req.body.startmin,
+        endhour: req.body.endhour,
+        endmin: req.body.endmin,
+        placename: req.body.placename,
+        taskname: req.body.taskname,
+        complete: req.body.complete
+    }
 
+    var notification_datetime = {
+        before_after: req.body.before_after,
+        num_notification: req.body.num_notification,
+        type_num: req.body.type_num
+    }
+    
+    var token = req.body.token;
+
+    var longtitude, latitude;
+    var reminder_id;
+    var date_notification_table, time_notification_table;
+
+    if(
+        token
+        && reminder_reminder.type
+        && reminder_reminder.allday
+        && reminder_reminder.startdate
+        && reminder_reminder.startmonth
+        && reminder_reminder.startyear
+        && reminder_reminder.enddate
+        && reminder_reminder.endmonth
+        && reminder_reminder.endyear
+        && reminder_reminder.taskname
+        && reminder_reminder.complete
+    ){
+        connection.query('SELECT * FROM place WHERE name = ?', reminder_reminder.placename, function(err, row) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select add reminder'
+                });
+            }else {
+                if(row.length > 0) {
+                    latitude = row[0].latitude;
+                    longtitude = row[0].longtitude;
+                }else {
+                    reminder_reminder.placename = null;
+                    latitude = null;
+                    longtitude = null;
+                }
+                console.log("Place name : " + reminder_reminder.placename + " \nLatitude : " + latitude + " && Longtitude : " + longtitude);
+            }
+        });
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select add reminder'
+                });
+            }else {
+                if(rows.length > 0){
+                    console.log("user_id : " + rows[0]._id);
+                    var id = rows[0]._id;
+                    if(reminder_reminder.allday == "0") {
+                       if(
+                            reminder_reminder.starthour
+                            && reminder_reminder.startmin
+                            && reminder_reminder.startdate
+                            && reminder_reminder.startmonth
+                            && reminder_reminder.startyear
+                            && reminder_reminder.endhour 
+                            && reminder_reminder.endmin
+                            && reminder_reminder.enddate
+                            && reminder_reminder.endmonth
+                            && reminder_reminder.endyear 
+                       ){
+                            var int_startmonth = parseInt(reminder_reminder.startmonth) - 1;
+                            var int_startyear = reminder_reminder.startyear;
+                            var start = new Date(int_startyear, int_startmonth, reminder_reminder.startdate, reminder_reminder.starthour, reminder_reminder.startmin);
+                            var startdate = start.toLocaleDateString();
+                            var starttime = start.toLocaleTimeString();
+
+                            var int_endmonth = parseInt(reminder_reminder.endmonth) - 1;
+                            var int_endyear = reminder_reminder.endyear;
+                            var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate, reminder_reminder.endhour, reminder_reminder.endmin);
+                            var enddate = end.toLocaleDateString();
+                            var endtime = end.toLocaleTimeString();
+
+                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
+                                if(err) {
+                                    res.send({
+                                        status: 400,
+                                        msg: 'allday = 0 : there are some error with query select add reminder'
+                                    });
+                                }else {
+                                    console.log("Reminder_id : " + rows.insertId);
+                                    reminder_id = rows.insertId;
+                                    if(
+                                        notification_datetime.before_after
+                                        && notification_datetime.num_notification
+                                        && notification_datetime.type_num
+                                    ){
+                                        var num = parseInt(notification_datetime.num_notification);
+
+                                        var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
+
+                                        var time_notification_table = notification_date.toLocaleTimeString();
+                                        var date_notification_table = notification_date.toLocaleDateString();
+
+                                        connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
+                                            if(err) {
+                                                res.send({
+                                                    status: 400,
+                                                    msg: 'allday = 0 : there are some error with insert notification'
+                                                });
+                                            }else {
+                                                res.send({
+                                                    status: 200,
+                                                    msg: 'allday = 0 : insert notification success'
+                                                });
+                                            }
+                                        });
+                                    }else {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'allday = 0 : dont have data notification start date, end date, start time, end time'
+                                        });
+                                    }
+                                }
+                            });
+                       }else {
+                        res.send({
+                            status: 400,
+                            msg: 'allday = 0 : dont have days hrs mins'
+                        });
+                       }
+                    }
+                    if(reminder_reminder.allday == "1") {
+                        if(
+                            reminder_reminder.startdate
+                            && reminder_reminder.startmonth
+                            && reminder_reminder.startyear
+                            && reminder_reminder.enddate
+                            && reminder_reminder.endmonth
+                            && reminder_reminder.endyear 
+                        ){
+                            var int_startmonth = parseInt(reminder_reminder.startmonth) - 1;
+                            var int_startyear = reminder_reminder.startyear;
+                            var start = new Date(int_startyear, int_startmonth, reminder_reminder.startdate);
+                            var startdate = start.toLocaleDateString();
+
+                            var int_endmonth = parseInt(reminder_reminder.endmonth) - 1;
+                            var int_endyear = reminder_reminder.endyear;
+                            var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate);
+                            var enddate = end.toLocaleDateString();
+                            
+                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "1", "'  + startdate + '", "' + enddate + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
+                                if(err) {
+                                    res.send({
+                                        status: 400,
+                                        msg: 'allday = 1 : there are some error with query select add reminder'
+                                    });
+                                }else {
+                                    console.log("Reminder_id : " + rows.insertId);
+                                    reminder_id = rows.insertId;
+                                    if(
+                                        notification_datetime.before_after
+                                        && notification_datetime.num_notification
+                                        && notification_datetime.type_num
+                                    ){
+                                        var num = parseInt(notification_datetime.num_notification);
+
+                                        var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
+
+                                        var time_notification_table = notification_date.toLocaleTimeString();
+                                        var date_notification_table = notification_date.toLocaleDateString();
+
+                                        connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
+                                            if(err) {
+                                                res.send({
+                                                    status: 400,
+                                                    msg: 'allday = 1 : there are some error with insert notification'
+                                                });
+                                            }else {
+                                                res.send({
+                                                    status: 200,
+                                                    msg: 'allday = 1 : insert notification success'
+                                                });
+                                            }
+                                        });
+                                    }else {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'allday = 0 : dont have data notification start date, end date, start time, end time'
+                                        });
+                                    }
+                                }
+                            });
+                        }else {
+                            res.send({
+                                status: 400,
+                                msg: 'allday = 0 : dont have days hrs mins'
+                            });
+                        }
+                     }
+                }else {
+                    res.send({
+                        msg: 'this token dont have user'
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            msg: 'addreminder reminder : data not enough'
+        });
+    }
+
+});
+
+router.post('/testdatetime', (req,res) => {
+    var jan = new Date(2018, 0, 12).getTime();
+
+    var feb18 = new Date(2018, 1, 12).getTime();
+    var feb14 = new Date(2014, 1, 12).getTime();
+    var feb17 = new Date(2017, 1, 12).getTime();
+    var feb16 = new Date(2016, 1, 12).getTime();
+    var feb12 = new Date(2012, 1, 12).getTime();
+
+    var mar14 = new Date(2014, 2, 12).getTime();
+    var mar17 = new Date(2017, 2, 12).getTime();
+    var mar16 = new Date(2016, 2, 12).getTime();
+    var mar12 = new Date(2012, 2, 12).getTime();
+
+    var mar = new Date(2018, 2, 12).getTime();
+
+    var apr = new Date(2018, 3, 12).getTime();
+    var may = new Date(2018, 4, 12).getTime();
+    var jun = new Date(2018, 5, 12).getTime();
+    var jul = new Date(2018, 6, 12).getTime();
+    var aug = new Date(2018, 7, 12).getTime();
+    var sep = new Date(2018, 8, 12).getTime();
+    var oct = new Date(2018, 9, 12).getTime();
+    var nov = new Date(2018, 10, 12).getTime();
+    var dec = new Date(2018, 11, 12).getTime();
+
+    var y2015 = new Date(2015, 3, 12).getTime();
+    var y2016 = new Date(2016, 3, 12).getTime();
+    var y2017 = new Date(2017, 3, 12).getTime();
+    var y2018 = new Date(2018, 3, 12).getTime();
+    var y2019 = new Date(2019, 3, 12).getTime();
+    var y2020 = new Date(2020, 3, 12).getTime();
+    var y2021 = new Date(2021, 3, 12).getTime();
+    var y2022 = new Date(2022, 3, 12).getTime();
+    var y2023 = new Date(2023, 3, 12).getTime();
+    var y2024 = new Date(2024, 3, 12).getTime();
+    var y2025 = new Date(2025, 3, 12).getTime();
+    var y2026 = new Date(2026, 3, 12).getTime();
+
+
+    console.log("KOM : " + (feb18-jan));
+    console.log("KOM : " + (apr-mar));
+
+    console.log("YON : " + (may-apr));
+    console.log("YON : " + (oct-sep));
+
+    console.log("FEB18 : " + (mar-feb18));
+    console.log("FEB14 : " + (mar14-feb14));
+
+    console.log("FEB17 : " + (mar17-feb17));
+    console.log("FEB16 : " + (mar16-feb16));
+
+    console.log("FEB12 : " + (mar12-feb12));
+
+    console.log("Y15 : " + (y2016-y2015));
+    console.log("Y16 : " + (y2017-y2016));
+    console.log("Y17 : " + (y2018-y2017));
+    console.log("Y18 : " + (y2019-y2018));
+    console.log("Y19 : " + (y2020-y2019));
+    console.log("Y20 : " + (y2021-y2020));
+    console.log("Y21 : " + (y2022-y2021));
+    console.log("Y22 : " + (y2023-y2022));
+    console.log("Y23 : " + (y2024-y2023));
+    console.log("Y24 : " + (y2025-y2024));
+    console.log("Y25 : " + (y2026-y2025));
+
+    res.send({
+        msg: "HELLO"
+    });
 });
