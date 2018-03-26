@@ -21,4 +21,132 @@ router.use(bodyParser.urlencoded({
 
 router.post('/location', (req,res) => {
     var token = req.body.token;
+
+    if(token) {
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select task complete location'
+                });
+            }else {
+                if(rows.length > 0) {
+                    var id = rows[0]._id;
+                    var complete = 1;
+                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Location"], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'there are some error with query select task complete location'
+                            });
+                        }else {
+                            res.send({
+                                status: 200,
+                                data: rows,
+                                msg: 'query success'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        status: 404,
+                        msg: 'dont have token'
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: "taskcomplete/location - permission denied"
+        });
+    }
+});
+
+router.post('/event', (req,res) => {
+    var token = req.body.token;
+
+    if(token) {
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select task complete event'
+                });
+            }else {
+                if(rows.length > 0) {
+                    var id = rows[0]._id;
+                    var complete = 1;
+                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Event"], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'there are some error with query select task complete event'
+                            });
+                        }else {
+                            res.send({
+                                status: 200,
+                                data: rows,
+                                msg: 'query success'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        status: 404,
+                        msg: 'dont have token'
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: "taskcomplete/event - permission denied"
+        });
+    }
+});
+
+router.post('/reminder', (req,res) => {
+    var token = req.body.token;
+
+    if(token) {
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'there are some error with query select task complete reminder'
+                });
+            }else {
+                if(rows.length > 0) {
+                    var id = rows[0]._id;
+                    var complete = 1;
+                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Reminder"], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'there are some error with query select task complete reminder'
+                            });
+                        }else {
+                            res.send({
+                                status: 200,
+                                data: rows,
+                                msg: 'query success'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        status: 404,
+                        msg: 'dont have token'
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: "taskcomplete/reminder - permission denied"
+        });
+    }
 });

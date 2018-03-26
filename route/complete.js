@@ -20,50 +20,21 @@ router.use(bodyParser.urlencoded({
 }));
 
 router.post('/location', (req,res) => {
-    var task = {
-        placename: req.body.placename,
-        notification: req.body.notification,
-        taskname: req.body.taskname
-    }
+    var reminder_id = req.body.reminder_id;
+    var complete = '1';
 
-    var token = req.body.token;
-
-    if(
-        task.placename
-        && task.notification
-        && task.taskname
-        && token
-    ){
-        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+    if(reminder_id){
+        connection.query(`UPDATE reminder SET complete = '` + complete + `' WHERE _id = '` + reminder_id + `'`, function(err, rows) {
             if(err) {
                 res.send({
                     status: 400,
                     msg: 'there are some error with query select complete location'
                 });
             }else {
-                if(rows.length > 0) {
-                    var id = rows[0]._id;
-                    var complete = '1';
-                    console.log(rows[0]._id + " " + task.placename);
-                    connection.query(`UPDATE reminder SET complete = '` + complete + `' WHERE user_id = '` + id + `' AND placename = '` + task.placename + `' AND notification = '` + task.notification + `' AND taskname = '` + task.taskname + `'` , function(err, rows) {
-                        if(err) {
-                            res.send({
-                                status: 400,
-                                msg: 'there are some error with query update complete location'
-                            });
-                        }else {
-                            res.send({
-                                status: 200,
-                                msg: "complete task location"
-                            });
-                        }
-                    });
-                }else {
-                    res.send({
-                        status: 404,
-                        msg: "dont have token"
-                    });
-                }
+                res.send({
+                    status: 200,
+                    msg: 'complete task location'
+                });
             }
         });
     }else {
