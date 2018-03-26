@@ -23,7 +23,7 @@ function count_milliseconds(start, end, before_after, num, type){
     var msec_start = start.getTime();
     var msec_end = end.getTime();
 
-    console.log("Start Date : " + start + "\nEnd Date : " + end + "\nMSEC Start Date : \n" + msec_start + "\nMSEC End Date : " + msec_start + "\n" + before_after, num, type);
+    console.log("Start Date : " + start + "\nEnd Date : " + end + "\nMSEC Start Date : " + msec_start + "\nMSEC End Date : " + msec_start + "\n" + before_after, num, type);
 
     var temp = 0;
     if(type == "Mins") {
@@ -45,8 +45,8 @@ function count_milliseconds(start, end, before_after, num, type){
                 num_month++;
             }
             else if(num_month == 3 || num_month == 5 || num_month == 8 || num_month == 10) {
-                temp = 2592000000;
-                num_month;
+                temp = temp + 2592000000;
+                num_month++;
             }
             else if(num_month == 1) {
                 if((start.getFullYear() + 1)%4 == 0) {
