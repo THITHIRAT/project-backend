@@ -32,8 +32,8 @@ router.post('/location', (req,res) => {
             }else {
                 if(rows.length > 0) {
                     var id = rows[0]._id;
-                    var complete = 1;
-                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Location"], function(err, rows) {
+                    var complete = '1';
+                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id, complete, "Location"], function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,
@@ -76,8 +76,8 @@ router.post('/event', (req,res) => {
             }else {
                 if(rows.length > 0) {
                     var id = rows[0]._id;
-                    var complete = 1;
-                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Event"], function(err, rows) {
+                    var complete = '1';
+                    connection.query('SELECT _id, user_id, start_date, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id, complete, "Event"], function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,
@@ -120,8 +120,8 @@ router.post('/reminder', (req,res) => {
             }else {
                 if(rows.length > 0) {
                     var id = rows[0]._id;
-                    var complete = 1;
-                    connection.query('SELECT _id, user_id, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id,complete, "Reminder"], function(err, rows) {
+                    var complete = '1';
+                    connection.query('SELECT _id, user_id, start_date, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id, complete,  "Reminder"], function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,

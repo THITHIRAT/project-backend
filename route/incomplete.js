@@ -19,7 +19,7 @@ router.use(bodyParser.urlencoded({
     extended : false
 }));
 
-router.post('/location', (req,res) => {
+router.post('/task', (req,res) => {
     var reminder_id = req.body.reminder_id;
     var complete = '0';
 
@@ -28,12 +28,12 @@ router.post('/location', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select complete location'
+                    msg: 'there are some error with query select incomplete task'
                 });
             }else {
                 res.send({
                     status: 200,
-                    msg: 'complete task location'
+                    msg: 'incomplete task'
                 });
             }
         });
