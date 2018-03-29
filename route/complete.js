@@ -28,19 +28,19 @@ router.post('/task', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select complete task'
+                    msg: 'complete/task :  there are some error with query select complete task'
                 });
             }else {
                 res.send({
                     status: 200,
-                    msg: 'complete task'
+                    msg: 'complete/task : complete'
                 });
             }
         });
     }else {
         res.send({
             status: 403,
-            msg: "permission denied"
+            msg: "complete/task : permission denied"
         });
     }
 });

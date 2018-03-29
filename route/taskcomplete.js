@@ -27,7 +27,7 @@ router.post('/location', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task complete location'
+                    msg: 'taskcomplete/location : there are some error with query select task complete location'
                 });
             }else {
                 if(rows.length > 0) {
@@ -37,20 +37,20 @@ router.post('/location', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task complete location'
+                                msg: 'taskcomplete/location : there are some error with query select task complete location'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'taskcomplete/location : select reminder location complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'taskcomplete/location : dont have token'
                     });
                 }
             }
@@ -58,7 +58,7 @@ router.post('/location', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "taskcomplete/location - permission denied"
+            msg: "taskcomplete/location : permission denied"
         });
     }
 });
@@ -71,7 +71,7 @@ router.post('/event', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task complete event'
+                    msg: 'taskcomplete/event : there are some error with query select task complete event'
                 });
             }else {
                 if(rows.length > 0) {
@@ -81,20 +81,20 @@ router.post('/event', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task complete event'
+                                msg: 'taskcomplete/event : there are some error with query select task complete event'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'taskcomplete/event : select reminder event complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'taskcomplete/event : dont have token'
                     });
                 }
             }
@@ -102,7 +102,7 @@ router.post('/event', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "taskcomplete/event - permission denied"
+            msg: "taskcomplete/event : permission denied"
         });
     }
 });
@@ -115,7 +115,7 @@ router.post('/reminder', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task complete reminder'
+                    msg: 'taskcomplete/reminder : there are some error with query select task complete reminder'
                 });
             }else {
                 if(rows.length > 0) {
@@ -125,20 +125,20 @@ router.post('/reminder', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task complete reminder'
+                                msg: 'taskcomplete/reminder : there are some error with query select task complete reminder'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'taskcomplete/reminder : select reminder reminder complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'taskcomplete/reminder : dont have token'
                     });
                 }
             }
@@ -146,7 +146,7 @@ router.post('/reminder', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "taskcomplete/reminder - permission denied"
+            msg: "taskcomplete/reminder : permission denied"
         });
     }
 });

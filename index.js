@@ -21,6 +21,9 @@ app.use('/place', place);
 var admin = require('./route/admin.js');
 app.use('/admin', admin);
 
+var catalog = require('./route/catalog.js');
+app.use('/catalog', catalog);
+
 var task = require('./route/task.js');
 app.use('/task', task);
 

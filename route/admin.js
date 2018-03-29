@@ -33,19 +33,19 @@ router.post('/login', (req,res) => {
             if(rows.length > 0) {
                 res.send({
                     status: 200,
-                    msg: "login success"
+                    msg: "admin/login : login success"
                 });
             }else {
                 res.send({
                     status: 400,
-                    msg: "email or password is incorrect"
+                    msg: "admin/login :  email or password is incorrect"
                 });
             }
         });
     }else {
         res.send({
             status: 403,
-            msg: "permission denied"
+            msg: "admin/login : permission denied"
         })
     }
 });

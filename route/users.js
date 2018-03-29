@@ -40,19 +40,19 @@ router.post('/register', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select register'
+                    msg: 'users/register : there are some error with query select register'
                 });
             }else {
                 if(rows.length > 0) {
                     res.send({
-                        msg: 'there are email to signup'
+                        msg: 'users/register : there are email to signup'
                     });
                 }else {
                     connection.query('INSERT INTO user SET ?', users_reg, function(err, rows) {
                         if(err) {
                             res.json({
                                 status: 400,
-                                msg: 'there are some error with query insert register'
+                                msg: 'users/register : there are some error with query insert register'
                             });
                         }else {
                             if(users_reg.password == confirmpassword) {
@@ -60,14 +60,14 @@ router.post('/register', (req,res) => {
                                     res.json({
                                         status: 200,
                                         data: users_reg,
-                                        msg: 'user register sucessfully',
+                                        msg: 'users/register : user register sucessfully',
                                         token: token
                                     });
                                     console.log(users_reg.username, users_reg.password, users_reg.email);
                                 });
                             }else {
                                 res.json({
-                                    msg: 'password not match'
+                                    msg: 'users/register : password not match'
                                 })
                             }
                         }
@@ -78,7 +78,7 @@ router.post('/register', (req,res) => {
     }else {
         res.status(403).send({
             status: 403,
-            msg: 'permission denied',
+            msg: 'users/register : permission denied',
             result: null
         });
     }
@@ -104,7 +104,7 @@ router.post('/login', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select login'
+                    msg: 'users/login : there are some error with query select login'
                 });
             }else {
                 if(rows.length > 0) { // have email account 
@@ -112,26 +112,26 @@ router.post('/login', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select login'
+                                msg: 'users/login : there are some error with query select login'
                             });
                         }else {
                             if(rows.length > 0) {
                                 connection.query('UPDATE user SET token = ? WHERE email = ?', [token, users_login.email], function(err, rows) {
                                     res.send({
-                                        msg: 'success login',
+                                        msg: 'users/login : success login',
                                         token: token
                                     });
                                 });
                             }else {
                                 res.send({
-                                    msg: 'password incorrect'
+                                    msg: 'users/login : password incorrect'
                                 });
                             }
                         }
                     });  
                 }else {
                     res.send({
-                        msg: 'database have not email'
+                        msg: 'users/login : database have not email'
                     });
                 }
             }
@@ -140,7 +140,7 @@ router.post('/login', (req,res) => {
         // invalid parameters 
         res.status(400).send({
             status: 400,
-            msg: "invalid email or password",
+            msg: "users/login : invalid email or password",
             result: null
         });
     }
@@ -154,7 +154,7 @@ router.post('/logout', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query'
+                    msg: 'users/logout : there are some error with query'
                 });
             } else {
                 if(rows.length > 0) {
@@ -162,25 +162,25 @@ router.post('/logout', (req,res) => {
                     connection.query('UPDATE user SET token = null WHERE email = ?', emaillogout, function(err, rows) {
                         if(err) {
                             res.send({
-                                msg: 'there are some error with query'
+                                msg: 'users/logout : there are some error with query'
                             });
                         }else {
                             res.send({
                                 data: emaillogout,
-                                msg: "log out complete"
+                                msg: "users/logout : log out complete"
                             });
                         }
                     });
                 }else {
                     res.send({
-                        msg: "cannot logout"
+                        msg: "users/logout : cannot logout"
                     });
                 }
             }
         });
     }else {
         res.send({
-            msg: 'permission denied'
+            msg: 'users/logout : permission denied'
         });
     }
 });
@@ -201,31 +201,35 @@ router.post('/resetpassword', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select'
+                    msg: 'users/resetpassword : there are some error with query select'
                 });
             }else {
                 if(rows.length > 0) {
                     connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, users_resetpassword.token, users_resetpassword.password], function(err, rows) {
                         if(err) {
                             res.send({
-                                msg: 'there are some error with query update'
+                                status: 400,
+                                msg: 'users/resetpassword : there are some error with query update'
                             });
                         }else {
                             res.send({
-                                msg: 'update new password'
+                                status: 200,
+                                msg: 'users/resetpassword : update new password'
                             });
                         }
                     });
                 }else {
                     res.send({
-                        msg: "don't have token"
+                        status: 400,
+                        msg: "users/resetpassword : don't have token"
                     });
                 }
             }
         });
     }else {
         res.send({
-            msg: "permission deined"
+            status: 403,
+            msg: "users/resetpassword : permission deined"
         });
     }
 });
@@ -239,31 +243,35 @@ router.post('/changeusername', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select'
+                    msg: 'users/changeusername : there are some error with query select'
                 });
             }else {
                 if(rows.length > 0) {
                     connection.query('UPDATE user SET username = ? WHERE token = ?', [newusername, token], function(err, rows) {
                         if(err) {
                             res.send({
-                                msg: 'there are some error with query update'
+                                status: 400,
+                                msg: 'users/changeusername : there are some error with query update'
                             });
                         }else {
                             res.send({
-                                msg: 'update new username'
+                                status: 200,
+                                msg: 'users/changeusername : update new username'
                             });
                         }
                     });
                 }else {
                     res.send({
-                        msg: "don't have token"
+                        status: 400,
+                        msg: "users/changeusername : don't have token"
                     });
                 }
             }
         });
     }else {
         res.send({
-            msg: "permission denied"
+            status: 403,
+            msg: "users/changeusername : permission denied"
         });
     }
 });

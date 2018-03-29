@@ -28,19 +28,19 @@ router.post('/task', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select incomplete task'
+                    msg: 'incomplete/task : there are some error with query select incomplete task'
                 });
             }else {
                 res.send({
                     status: 200,
-                    msg: 'incomplete task'
+                    msg: 'incomplete/task : complete'
                 });
             }
         });
     }else {
         res.send({
             status: 403,
-            msg: "permission denied"
+            msg: "incomplete/task : permission denied"
         });
     }
 

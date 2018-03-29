@@ -102,13 +102,13 @@ router.post('/location', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select location'
+                    msg: 'addreminder/location : there are some error with query select location'
                 });
             }else {
                 if(rows.length <= 0) {
                     res.send({
-                        status: 404,
-                        msg: 'can not find place'
+                        status: 400,
+                        msg: 'addreminder/location : can not find place'
                     });
                 }else {
                     var longtitude = rows[0].longtitude;
@@ -117,7 +117,7 @@ router.post('/location', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select add reminder location'
+                                msg: 'addreminder/location : there are some error with query select add reminder location'
                             });
                         }else {
                             if(rows.length > 0) {
@@ -127,18 +127,20 @@ router.post('/location', (req,res) => {
                                     if(err) {
                                         res.send({
                                             status: 400,
-                                            msg: 'there are some error with query insert add reminder location'
+                                            msg: 'addreminder/location : there are some error with query insert add reminder location'
                                         });
                                     }else {
                                         res.send({
-                                            msg: 'insert location reminder'
+                                            status: 200,
+                                            msg: 'addreminder/location : insert location reminder complete'
                                         });
                                         console.log('location');
                                     }
                                 });
                             }else {
                                 res.send({
-                                    msg: 'blank'
+                                    status: 400,
+                                    msg: 'addreminder/location : dont have token'
                                 });
                             }
                         }
@@ -148,7 +150,7 @@ router.post('/location', (req,res) => {
         });
     }else {
         res.send({
-            msg: "permission denied"
+            msg: "addreminder/location : permission denied"
         });
     }
 });
@@ -201,7 +203,7 @@ router.post('/event', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select add event'
+                    msg: 'addreminder/event : there are some error with query select add event'
                 });
             }else {
                 if(row.length > 0) {
@@ -219,7 +221,7 @@ router.post('/event', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select add event'
+                    msg: 'addreminder/event : there are some error with query select add event'
                 });
             }else {
                 if(rows.length > 0) {
@@ -254,7 +256,7 @@ router.post('/event', (req,res) => {
                                 if(err) {
                                     res.send({
                                         status: 400,
-                                        msg: 'allday = 0 : there are some error with query select add event'
+                                        msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
                                     });
                                 }else {
                                     console.log("Reminder_id : " + rows.insertId);
@@ -275,19 +277,19 @@ router.post('/event', (req,res) => {
                                             if(err) {
                                                 res.send({
                                                     status: 400,
-                                                    msg: 'allday = 0 : there are some error with insert notification'
+                                                    msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
                                                 });
                                             }else {
                                                 res.send({
                                                     status: 200,
-                                                    msg: 'allday = 0 : insert notification success'
+                                                    msg: 'addreminder/event : allday = 0 : insert notification complete'
                                                 });
                                             }
                                         });
                                     }else {
                                         res.send({
                                             status: 400,
-                                            msg: 'allday = 0 : dont have data notification start date, end date, start time, end time'
+                                            msg: 'addreminder/event : allday = 0 : dont have data notification start date, end date, start time, end time'
                                         });
                                     }
                                 }
@@ -295,7 +297,7 @@ router.post('/event', (req,res) => {
                         }else {
                             res.send({
                                 status: 400,
-                                msg: 'allday = 0 : dont have starttime or endtime'
+                                msg: 'addreminder/event : allday = 0 : dont have starttime or endtime'
                             });
                         }
                     }
@@ -323,7 +325,7 @@ router.post('/event', (req,res) => {
                                 if(err) {
                                     res.send({
                                         status: 400,
-                                        msg: 'allday = 1 : there are some error with insert reminder'
+                                        msg: 'addreminder/event : allday = 1 : there are some error with insert reminder'
                                     });
                                 }else {
                                     console.log("Reminder_id : " + rows.insertId);
@@ -344,19 +346,19 @@ router.post('/event', (req,res) => {
                                             if(err) {
                                                 res.send({
                                                     status: 400,
-                                                    msg: 'allday = 1 : there are some error with insert notification'
+                                                    msg: 'addreminder/event : allday = 1 : there are some error with insert notification'
                                                 });
                                             }else {
                                                 res.send({
                                                     status: 200,
-                                                    msg: 'allday = 1 : insert notification success'
+                                                    msg: 'addreminder/event : allday = 1 : insert notification complete'
                                                 });
                                             }
                                         });
                                     }else {
                                         res.send({
                                             status: 400,
-                                            msg: 'allday = 1 : dont have allday > date, month, year, hrs, mins'
+                                            msg: 'addreminder/event : allday = 1 : dont have allday > date, month, year, hrs, mins'
                                         });
                                     }
                                 }
@@ -364,13 +366,13 @@ router.post('/event', (req,res) => {
                         }else {
                             res.send({
                                 status : 400,
-                                msg: "allday = 1 : input not complete"
+                                msg: "addreminder/event : allday = 1 : input not complete"
                             });
                         }
                     }
                 }else {
                     res.send({
-                        msg: 'this token dont have user'
+                        msg: 'addreminder/event : this token dont have user'
                     });
                 }
             }
@@ -442,7 +444,7 @@ router.post('/reminder', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select add reminder'
+                    msg: 'addreminder/reminder : there are some error with query select add reminder'
                 });
             }else {
                 if(row.length > 0) {
@@ -460,7 +462,7 @@ router.post('/reminder', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select add reminder'
+                    msg: 'addreminder/reminder : there are some error with query select add reminder'
                 });
             }else {
                 if(rows.length > 0){
@@ -495,7 +497,7 @@ router.post('/reminder', (req,res) => {
                                 if(err) {
                                     res.send({
                                         status: 400,
-                                        msg: 'allday = 0 : there are some error with query select add reminder'
+                                        msg: 'addreminder/reminder : allday = 0 : there are some error with query select add reminder'
                                     });
                                 }else {
                                     console.log("Reminder_id : " + rows.insertId);
@@ -515,7 +517,7 @@ router.post('/reminder', (req,res) => {
                                                 if(err) {
                                                     res.send({
                                                         status: 400,
-                                                        msg: 'allday = 1 : there are some error with insert notification 1'
+                                                        msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 1'
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_1 : success");
@@ -563,7 +565,7 @@ router.post('/reminder', (req,res) => {
                                                 if(err) {
                                                     res.send({
                                                         status: 400,
-                                                        msg: 'allday = 1 : there are some error with insert notification 3'
+                                                        msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 3'
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_3 : success");
@@ -572,15 +574,15 @@ router.post('/reminder', (req,res) => {
                                         }
                                     }
                                     res.send({
-                                        status: 400,
-                                        msg: 'allday = 1 : insert notification success'
+                                        status: 200,
+                                        msg: 'addreminder/reminder : allday = 1 : insert notification complete'
                                     });
                                 }
                             });
                        }else {
                         res.send({
                             status: 400,
-                            msg: 'allday = 0 : dont have days hrs mins'
+                            msg: 'addreminder/reminder : allday = 0 : dont have days hrs mins'
                         });
                        }
                     }
@@ -607,7 +609,7 @@ router.post('/reminder', (req,res) => {
                                 if(err) {
                                     res.send({
                                         status: 400,
-                                        msg: 'allday = 1 : there are some error with query select add reminder'
+                                        msg: 'addreminder/reminder : allday = 1 : there are some error with query select add reminder'
                                     });
                                 }else {
                                     console.log("Reminder_id : " + rows.insertId);
@@ -628,7 +630,7 @@ router.post('/reminder', (req,res) => {
                                                 if(err) {
                                                     res.send({
                                                         status: 400,
-                                                        msg: 'allday = 1 : there are some error with insert notification 1'
+                                                        msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 1'
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_1 : success");
@@ -652,7 +654,7 @@ router.post('/reminder', (req,res) => {
                                                 if(err) {
                                                     res.send({
                                                         status: 400,
-                                                        msg: 'allday = 1 : there are some error with insert notification 2'
+                                                        msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 2'
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_2 : success");
@@ -676,7 +678,7 @@ router.post('/reminder', (req,res) => {
                                                 if(err) {
                                                     res.send({
                                                         status: 400,
-                                                        msg: 'allday = 1 : there are some error with insert notification 3'
+                                                        msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 3'
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_3 : success");
@@ -685,21 +687,21 @@ router.post('/reminder', (req,res) => {
                                         }
                                     }
                                     res.send({
-                                        status: 400,
-                                        msg: 'allday = 1 : insert notification success'
+                                        status: 200,
+                                        msg: 'addreminder/reminder : allday = 1 : insert notification success'
                                     });
                                 }
                             });
                         }else {
                             res.send({
                                 status: 400,
-                                msg: 'allday = 0 : dont have days hrs mins'
+                                msg: 'addreminder/reminder : allday = 0 : dont have days hrs mins'
                             });
                         }
                      }
                 }else {
                     res.send({
-                        msg: 'this token dont have user'
+                        msg: 'addreminder/reminder : this token dont have user'
                     });
                 }
             }

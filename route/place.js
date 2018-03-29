@@ -35,24 +35,26 @@ router.post('/location', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select location'
+                    msg: 'place/location : there are some error with query select location'
                 });
             }else {
                 if(rows.length > 0) {
                     res.send({
-                        msg: 'insert location already'
+                        status: 400,
+                        msg: 'place/location : insert location already'
                     });
                 }else {
                     connection.query('INSERT INTO place SET ?', place, function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query insert location'
+                                msg: 'place/location : there are some error with query insert location'
                             });
                         }else {
                             console.log(place);
                             res.send({
-                                msg: 'sucess insert location'
+                                status: 200,
+                                msg: 'place/location : insert location complete'
                             });
                         }
                     });
@@ -61,7 +63,7 @@ router.post('/location', (req,res) => {
         });   
     }else {
         res.send({
-            msg: "permission denied"
+            msg: "place/location : permission denied"
         });
     }
 });
@@ -74,24 +76,24 @@ router.post('/search', (req,res) => {
             if(err) { 
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select search'
+                    msg: 'place/serach : there are some error with query select search'
                 });
             }else {
                 if(rows.length > 0) {
                     res.send({
                         data: rows,
-                        msg: 'txt have some row'
+                        msg: 'place/serach : text have some row'
                     });
                 }else {
                     res.send({
-                        msg: 'every rows dont have txt'
+                        msg: 'place/serach : every rows dont have txt'
                     });
                 }
             }
         });
     }else {
         res.send({
-            msg: "permission denied"
+            msg: "place/serach : permission denied"
         });
     }
 });

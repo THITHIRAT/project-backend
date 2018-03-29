@@ -27,7 +27,7 @@ router.post('/location', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task location'
+                    msg: 'task/location : there are some error with query select task location'
                 });
             }else {
                 if(rows.length > 0) {
@@ -37,20 +37,20 @@ router.post('/location', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task location'
+                                msg: 'task/location : there are some error with query select task location'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'task/location : select reminder location complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'task/location : dont have token'
                     });
                 }
             }
@@ -58,7 +58,7 @@ router.post('/location', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "task/location - permission denied"
+            msg: "task/location : permission denied"
         });
     }
 });
@@ -71,7 +71,7 @@ router.post('/event', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task event'
+                    msg: 'task/event : there are some error with query select task event'
                 });
             }else {
                 if(rows.length > 0) {
@@ -81,20 +81,20 @@ router.post('/event', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task event'
+                                msg: 'task/event : there are some error with query select task event'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'task/event : select reminder event complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'task/event : dont have token'
                     });
                 }
             }
@@ -102,7 +102,7 @@ router.post('/event', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "task/event - permission denied"
+            msg: "task/event : permission denied"
         });
     }
 });
@@ -115,7 +115,7 @@ router.post('/reminder', (req,res) => {
             if(err) {
                 res.send({
                     status: 400,
-                    msg: 'there are some error with query select task reminder'
+                    msg: 'task/reminder : there are some error with query select task reminder'
                 });
             }else {
                 if(rows.length > 0) {
@@ -125,20 +125,20 @@ router.post('/reminder', (req,res) => {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'there are some error with query select task reminder'
+                                msg: 'task/reminder : there are some error with query select task reminder'
                             });
                         }else {
                             res.send({
                                 status: 200,
                                 data: rows,
-                                msg: 'query success'
+                                msg: 'task/reminder : select reminder reminder complete'
                             });
                         }
                     });
                 }else {
                     res.send({
                         status: 404,
-                        msg: 'dont have token'
+                        msg: 'task/reminder : dont have token'
                     });
                 }
             }
@@ -146,7 +146,7 @@ router.post('/reminder', (req,res) => {
     }else {
         res.send({
             status: 403,
-            msg: "task/reminder - permission denied"
+            msg: "task/reminder : permission denied"
         });
     }
 });
