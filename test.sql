@@ -2,8 +2,8 @@
 -- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Mar 21, 2018 at 05:12 PM
+-- Host: localhost:8889
+-- Generation Time: Mar 29, 2018 at 06:36 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -45,6 +45,32 @@ INSERT INTO `admin` (`_id`, `email`, `password`, `privilege`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `catalog`
+--
+
+CREATE TABLE `catalog` (
+  `_id` int(32) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `item` varchar(50) DEFAULT NULL,
+  `period_num` int(10) NOT NULL,
+  `period_type_date` varchar(6) NOT NULL,
+  `real_period_num` int(10) DEFAULT NULL,
+  `real_period_type_date` varchar(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `catalog`
+--
+
+INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, `real_period_num`, `real_period_type_date`) VALUES
+(7, 'fresh food', 'meat', 7, 'days', NULL, NULL),
+(13, 'fresh food', 'fruit', 7, 'days', NULL, NULL),
+(14, 'battery', NULL, 1, 'years', NULL, NULL),
+(15, 'food', 'snack', 1, 'years', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `notification`
 --
 
@@ -60,8 +86,36 @@ CREATE TABLE `notification` (
 --
 
 INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`) VALUES
-(13, 214, '21:12:00', '2560-03-15'),
-(14, 215, '21:12:00', '2560-03-15');
+(88, 284, '00:00:00', '2559-11-11'),
+(89, 284, '00:00:00', '2560-04-01'),
+(90, 285, '23:54:00', '2561-03-22'),
+(91, 289, '20:30:00', '2560-04-15'),
+(92, 292, '12:15:00', '2559-11-11'),
+(93, 292, '12:15:00', '2560-04-01'),
+(94, 293, '00:00:00', '0000-00-00'),
+(95, 293, '00:00:00', '0000-00-00'),
+(96, 293, '00:00:00', '0000-00-00'),
+(97, 294, '00:00:00', '0000-00-00'),
+(98, 294, '00:00:00', '0000-00-00'),
+(99, 294, '00:00:00', '0000-00-00'),
+(100, 295, '00:00:00', '0000-00-00'),
+(101, 295, '00:00:00', '0000-00-00'),
+(102, 295, '00:00:00', '0000-00-00'),
+(103, 296, '00:00:00', '0000-00-00'),
+(104, 296, '00:00:00', '0000-00-00'),
+(105, 296, '00:00:00', '0000-00-00'),
+(106, 297, '00:00:00', '0000-00-00'),
+(107, 297, '00:00:00', '0000-00-00'),
+(108, 297, '00:00:00', '0000-00-00'),
+(109, 298, '03:14:00', '2561-03-30'),
+(110, 298, '18:44:00', '2561-03-29'),
+(111, 299, '03:10:00', '2561-03-30'),
+(112, 299, '03:18:00', '2561-03-30'),
+(113, 307, '20:30:00', '2560-04-15'),
+(114, 310, '00:00:00', '0000-00-00'),
+(115, 310, '00:00:00', '0000-00-00'),
+(116, 310, '00:00:00', '0000-00-00'),
+(117, 311, '20:30:00', '2560-04-15');
 
 -- --------------------------------------------------------
 
@@ -107,7 +161,13 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (34, 'Bangkok', 100.5017651, 13.7563309),
 (39, 'Siam Center', 100.53286349999999, 13.746252399999998),
 (40, '33/147 Suwinthawong 34 Soi 4', 100.78772479999999, 13.8052674),
-(41, 'Lopburi', 100.6533706, 14.799508099999997);
+(41, 'Lopburi', 100.6533706, 14.799508099999997),
+(42, 'Don Mueang International Airport', 100.6041987, 13.9132602),
+(43, 'Mega Mall', 26.1525885, 44.442398499999996),
+(44, 'Tak', 99.1258498, 16.8839901),
+(45, 'Suvarnabhumi Airport', 100.75011239999999, 13.689999100000001),
+(46, 'Thammasat University', 100.4923209, 13.7565121),
+(47, 'Computer Engineering Department', 33.908290199999996, 35.1461468);
 
 -- --------------------------------------------------------
 
@@ -137,8 +197,35 @@ CREATE TABLE `reminder` (
 --
 
 INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`) VALUES
-(214, 49, 'Event', '', 1, '2560-02-20', '2560-11-12', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learn', 0),
-(215, 49, 'Event', '', 1, '2560-02-20', '2560-11-12', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learn', 0);
+(284, 49, 'Reminder', '', 1, '2560-04-10', '2560-05-30', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'reminder', 1),
+(285, 27, 'Reminder', '', 1, '2561-03-23', '2561-03-26', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', 1),
+(286, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'go ', 1),
+(287, 27, 'Event', '', 1, '2561-03-31', '2561-03-31', NULL, NULL, 'Suvarnabhumi Airport', 13.689999100000001, 100.75011239999999, 'travel', 1),
+(288, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
+(289, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 1),
+(290, 27, 'Reminder', '', 0, '2561-03-29', '2561-03-29', '06:30:00', '07:40:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
+(291, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-30', '05:35:00', '19:30:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
+(292, 49, 'Reminder', '', 0, '2560-04-10', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'reminder', 0),
+(293, 27, 'Reminder', '', 0, '2561-03-31', '2561-03-31', '06:00:00', '06:45:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
+(294, 27, 'Reminder', '', 1, '2561-03-28', '2561-03-28', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'hello complete', 1),
+(295, 27, 'Reminder', '', 1, '2561-03-28', '2561-03-30', NULL, NULL, 'null', 0, 0, 'test all', 1),
+(296, 27, 'Reminder', '', 0, '2561-03-29', '2561-03-28', '04:43:00', '04:30:00', 'null', 0, 0, 'test 2', 0),
+(297, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-31', '05:44:00', '03:44:00', 'null', 0, 0, 'test 2', 0),
+(298, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-07', '04:44:00', '04:20:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test 3', 0),
+(299, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-27', '03:20:00', '03:17:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test 3', 0),
+(300, 27, 'Event', '', 1, '2561-03-29', '2561-03-30', NULL, NULL, 'null', 0, 0, 'ttt', 0),
+(301, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'vggffff', 1),
+(302, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, '', 1),
+(303, 27, 'Location', 'Depart', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'gggg', 1),
+(304, 27, 'Location', 'Pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'kjjjj', 1),
+(305, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'jhyrcjt', 1),
+(306, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'kmitl', 1),
+(307, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 0),
+(308, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'bangkok', 0),
+(309, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'shopping', 0),
+(310, 27, 'Reminder', '', 1, '2561-03-29', '2561-03-29', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test', 0),
+(311, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 0),
+(312, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 0);
 
 -- --------------------------------------------------------
 
@@ -163,7 +250,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', '87EvystRC5MFSKQKR'),
+(27, 'test', 'test1234', 'test1234@test.com', 'EZehYAdDS7AB6NTnK'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -171,7 +258,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (32, 'hello', 'test1234', 'test1234@testest.com', NULL),
 (33, 'hello', 'test1234', 'test1234@test1234.com', NULL),
 (34, 'hello', 'test1234', 'test1234@test12345.com', NULL),
-(35, 'hello', 'test1234', 'a@test12345.com', '9NGS2G53j4dq5wwzq'),
+(35, 'hello', 'test1234', 'a@test12345.com', 'C8r4kRrqrjqDPD76q'),
 (36, 'hello', 'test1234', 'b@test12345.com', NULL),
 (37, 'hello', 'test1234', 'c@test12345.com', NULL),
 (38, 'hello', 'test1234', 'd@test12345.com', NULL),
@@ -199,7 +286,8 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (60, 'hello', '1234', 'z@test12345.com', NULL),
 (61, 'hello', '1234', 'a@hotmail.com', '34kPFj9GERGJFartk'),
 (62, 'f', '123', 'ee', NULL),
-(63, 'hello', 'test', 'b@hotmail.com', 'jXX4ijuZ7TCZAYqjX');
+(63, 'hello', 'test', 'b@hotmail.com', 'jXX4ijuZ7TCZAYqjX'),
+(64, 'hello', 'test1234', 'z@hotmail.com', 'wdX5FXK9gASYstjwS');
 
 --
 -- Indexes for dumped tables
@@ -209,6 +297,12 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 -- Indexes for table `admin`
 --
 ALTER TABLE `admin`
+  ADD PRIMARY KEY (`_id`);
+
+--
+-- Indexes for table `catalog`
+--
+ALTER TABLE `catalog`
   ADD PRIMARY KEY (`_id`);
 
 --
@@ -245,25 +339,30 @@ ALTER TABLE `user`
 ALTER TABLE `admin`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
+-- AUTO_INCREMENT for table `catalog`
+--
+ALTER TABLE `catalog`
+  MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+--
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
 --
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=313;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;COMMIT;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
