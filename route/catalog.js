@@ -168,18 +168,62 @@ router.post('/remove', (req,res) => {
     }
 });
 
+router.post('/update', (req,res) => {
+    var catalog_id = req.body.catalog_id;
+
+    connection.query('SELECT * FROM catalog WHERE _id = ?', [catalog_id], function(err,rows){
+        if(err){
+            res.send({
+                status: 400,
+                msg: 'catalog/update : there are some error with query select catalog'
+            });
+        }else {
+            if(rows.length > 0) {
+                if(rows[0].real_period_num != null && rows[0].real_period_type_date != null) {
+                    console.log(rows[0].real_period_num + " " + rows[0].real_period_type_date);
+                    var new_period_num = rows[0].real_period_num;
+                    var new_period_type_date = rows[0].real_period_type_date;
+                    connection.query('UPDATE catalog SET period_num = ?, period_type_date = ? WHERE _id = ?', [new_period_num, new_period_type_date, catalog_id], function(err,rows){
+                        if(err){
+                            res.send({
+                                status: 400,
+                                msg: 'catalog/update : there are some error with query update catalog'
+                            });
+                        }else {
+                            res.send({
+                                status: 200,
+                                msg: 'catalog/update : update period complete'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        status: 400,
+                        msg: 'catalog/update : period = null'
+                    });
+                }
+            }else {
+                res.send({
+                    status: 400,
+                    msg: 'catalog/update : dont have catalog_id in database'
+                });
+            }
+        }
+    });
+});
+
 router.post('/show', (req,res) => {
-    connection.query('SELECT * FROM catalog', function(err,rows) {
+    connection.query('SELECT * FROM reminder WHERE type = "Reminder"', function(err,rows) {
         if(err) {
             res.send({
                 status: 400,
                 msg: 'catalog/show : there are some error with query select catalog'
             });
         }else {
-            var data = rows;
-            data.forEach(element => {
-                element.period = element.period_num + " " + element.period_type_date;
-            });
+            // var data = rows;
+            // data.forEach(element => {
+            //     element.period = element.period_num + " " + element.period_type_date;
+            // });
             res.send({
                 status: 200,
                 data: data,
