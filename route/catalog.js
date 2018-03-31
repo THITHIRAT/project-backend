@@ -213,20 +213,40 @@ router.post('/update', (req,res) => {
 });
 
 router.post('/show', (req,res) => {
-    connection.query('SELECT * FROM reminder WHERE type = "Reminder"', function(err,rows) {
+    var token = req.body.token;
+    var user_id;
+    connection.query('SELECT * FROM user WHERE token = ?', [token], function(err,rows){
+        if(err) {
+            res.send({
+                status: 400,
+                msg: 'catalog/show : there are some error with query select user'
+            });
+        }else {
+            if(rows.length > 0) {
+                user_id = rows[0]._id;
+                console.log("User ID : " + user_id);
+            }else {
+                res.send({
+                    status: 400,
+                    msg: 'catalog/show : dont have this token'
+                });
+            }
+        }
+    });
+    // var data = rows;
+    // data.forEach(element => {
+    //     element.period = element.period_num + " " + element.period_type_date;
+    // });
+    connection.query('SELECT * FROM reminder WHERE user_id = ?', [user_id], function(err,rows) {
         if(err) {
             res.send({
                 status: 400,
                 msg: 'catalog/show : there are some error with query select catalog'
             });
         }else {
-            // var data = rows;
-            // data.forEach(element => {
-            //     element.period = element.period_num + " " + element.period_type_date;
-            // });
             res.send({
                 status: 200,
-                data: data,
+                data: rows,
                 msg: 'catalog/show : select complete'
             });
         }
