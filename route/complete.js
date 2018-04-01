@@ -24,7 +24,9 @@ router.post('/task', (req,res) => {
     var complete = '1';
 
     if(reminder_id){
-        connection.query(`UPDATE reminder SET complete = '` + complete + `' WHERE _id = '` + reminder_id + `'`, function(err, rows) {
+        var timestamp = new Date();
+        var now = timestamp.toLocaleString();
+        connection.query(`UPDATE reminder SET complete = '` + complete + `', timestamp_complete = '` + now + `' WHERE _id = '` + reminder_id + `'`, function(err, rows) {
             if(err) {
                 res.send({
                     status: 400,
@@ -37,6 +39,10 @@ router.post('/task', (req,res) => {
                 });
             }
         });
+        // res.send({
+        //     status: 403,
+        //     msg: "complete/task : permission denied"
+        // });
     }else {
         res.send({
             status: 403,

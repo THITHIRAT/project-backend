@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Mar 29, 2018 at 06:36 PM
+-- Generation Time: Apr 01, 2018 at 04:06 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -115,7 +115,13 @@ INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`) VALUES
 (114, 310, '00:00:00', '0000-00-00'),
 (115, 310, '00:00:00', '0000-00-00'),
 (116, 310, '00:00:00', '0000-00-00'),
-(117, 311, '20:30:00', '2560-04-15');
+(117, 311, '20:30:00', '2560-04-15'),
+(118, 314, '00:00:00', '0000-00-00'),
+(119, 314, '00:00:00', '0000-00-00'),
+(120, 314, '00:00:00', '0000-00-00'),
+(121, 315, '00:00:00', '0000-00-00'),
+(122, 315, '00:00:00', '0000-00-00'),
+(123, 315, '00:00:00', '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -189,43 +195,20 @@ CREATE TABLE `reminder` (
   `latitude` double NOT NULL,
   `longtitude` double NOT NULL,
   `taskname` varchar(64) NOT NULL,
-  `complete` tinyint(1) NOT NULL
+  `complete` tinyint(1) NOT NULL,
+  `timestamp_complete` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `reminder`
 --
 
-INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`) VALUES
-(284, 49, 'Reminder', '', 1, '2560-04-10', '2560-05-30', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'reminder', 1),
-(285, 27, 'Reminder', '', 1, '2561-03-23', '2561-03-26', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', 1),
-(286, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'go ', 1),
-(287, 27, 'Event', '', 1, '2561-03-31', '2561-03-31', NULL, NULL, 'Suvarnabhumi Airport', 13.689999100000001, 100.75011239999999, 'travel', 1),
-(288, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 1),
-(289, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 1),
-(290, 27, 'Reminder', '', 0, '2561-03-29', '2561-03-29', '06:30:00', '07:40:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
-(291, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-30', '05:35:00', '19:30:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
-(292, 49, 'Reminder', '', 0, '2560-04-10', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'reminder', 0),
-(293, 27, 'Reminder', '', 0, '2561-03-31', '2561-03-31', '06:00:00', '06:45:00', 'Thammasat University', 13.7565121, 100.4923209, 'test', 1),
-(294, 27, 'Reminder', '', 1, '2561-03-28', '2561-03-28', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'hello complete', 1),
-(295, 27, 'Reminder', '', 1, '2561-03-28', '2561-03-30', NULL, NULL, 'null', 0, 0, 'test all', 1),
-(296, 27, 'Reminder', '', 0, '2561-03-29', '2561-03-28', '04:43:00', '04:30:00', 'null', 0, 0, 'test 2', 0),
-(297, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-31', '05:44:00', '03:44:00', 'null', 0, 0, 'test 2', 0),
-(298, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-07', '04:44:00', '04:20:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test 3', 0),
-(299, 27, 'Reminder', '', 0, '2561-03-30', '2561-03-27', '03:20:00', '03:17:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test 3', 0),
-(300, 27, 'Event', '', 1, '2561-03-29', '2561-03-30', NULL, NULL, 'null', 0, 0, 'ttt', 0),
-(301, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'vggffff', 1),
-(302, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, '', 1),
-(303, 27, 'Location', 'Depart', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'gggg', 1),
-(304, 27, 'Location', 'Pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'kjjjj', 1),
-(305, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Computer Engineering Department', 35.1461468, 33.908290199999996, 'jhyrcjt', 1),
-(306, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'kmitl', 1),
-(307, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 0),
-(308, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'bangkok', 0),
-(309, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'shopping', 0),
-(310, 27, 'Reminder', '', 1, '2561-03-29', '2561-03-29', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'test', 0),
-(311, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 0),
-(312, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 0);
+INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`, `timestamp_complete`) VALUES
+(309, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'shopping', 1, '2561-04-01 22:45:22'),
+(311, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 1, '2561-04-01 22:41:54'),
+(312, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 0, NULL),
+(313, 27, 'Event', '', 1, '2561-04-19', '2561-04-26', NULL, NULL, 'null', 0, 0, 'Meeting', 0, NULL),
+(315, 27, 'Reminder', '', 1, '2561-04-17', '2561-04-19', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'fresh food', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -250,7 +233,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', 'EZehYAdDS7AB6NTnK'),
+(27, 'test', 'test1234', 'test1234@test.com', 'Trcw6cJqrHkw47EMZ'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -347,7 +330,7 @@ ALTER TABLE `catalog`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 --
 -- AUTO_INCREMENT for table `place`
 --
@@ -357,7 +340,7 @@ ALTER TABLE `place`
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=313;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=316;
 --
 -- AUTO_INCREMENT for table `user`
 --
