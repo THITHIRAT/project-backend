@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Apr 01, 2018 at 04:06 PM
+-- Generation Time: Apr 03, 2018 at 05:42 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -64,9 +64,9 @@ CREATE TABLE `catalog` (
 
 INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, `real_period_num`, `real_period_type_date`) VALUES
 (7, 'fresh food', 'meat', 7, 'days', NULL, NULL),
-(13, 'fresh food', 'fruit', 7, 'days', NULL, NULL),
-(14, 'battery', NULL, 1, 'years', NULL, NULL),
-(15, 'food', 'snack', 1, 'years', NULL, NULL);
+(13, 'fresh food', 'apple', 36, 'days', 36, 'days'),
+(15, 'food', 'snack', 1, 'years', NULL, NULL),
+(16, 'fresh food', NULL, 7, 'days', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -121,7 +121,51 @@ INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`) VALUES
 (120, 314, '00:00:00', '0000-00-00'),
 (121, 315, '00:00:00', '0000-00-00'),
 (122, 315, '00:00:00', '0000-00-00'),
-(123, 315, '00:00:00', '0000-00-00');
+(123, 315, '00:00:00', '0000-00-00'),
+(124, 316, '00:00:00', '0000-00-00'),
+(125, 316, '00:00:00', '0000-00-00'),
+(126, 316, '00:00:00', '0000-00-00'),
+(127, 317, '00:00:00', '0000-00-00'),
+(128, 317, '00:00:00', '0000-00-00'),
+(129, 317, '00:00:00', '0000-00-00'),
+(130, 318, '00:00:00', '0000-00-00'),
+(131, 318, '00:00:00', '0000-00-00'),
+(132, 318, '00:00:00', '0000-00-00'),
+(133, 319, '00:00:00', '0000-00-00'),
+(134, 319, '00:00:00', '0000-00-00'),
+(135, 319, '00:00:00', '0000-00-00'),
+(136, 320, '12:15:00', '2559-11-11'),
+(137, 320, '12:15:00', '2560-04-01'),
+(138, 321, '00:00:00', '0000-00-00'),
+(139, 321, '00:00:00', '0000-00-00'),
+(140, 321, '00:00:00', '0000-00-00'),
+(141, 322, '00:00:00', '0000-00-00'),
+(142, 322, '00:00:00', '0000-00-00'),
+(143, 322, '00:00:00', '0000-00-00'),
+(144, 323, '00:00:00', '0000-00-00'),
+(145, 323, '00:00:00', '0000-00-00'),
+(146, 323, '00:00:00', '0000-00-00'),
+(147, 324, '00:00:00', '0000-00-00'),
+(148, 324, '00:00:00', '0000-00-00'),
+(149, 324, '00:00:00', '0000-00-00'),
+(150, 325, '00:00:00', '0000-00-00'),
+(151, 325, '00:00:00', '0000-00-00'),
+(152, 325, '00:00:00', '0000-00-00'),
+(153, 327, '20:30:00', '2560-04-15'),
+(154, 328, '20:30:00', '2560-04-15'),
+(155, 329, '12:15:00', '2559-11-11'),
+(156, 329, '12:15:00', '2560-04-01'),
+(157, 331, '20:30:00', '2560-04-15'),
+(158, 332, '12:15:00', '2559-11-11'),
+(159, 332, '12:15:00', '2560-04-01'),
+(160, 333, '12:00:00', '2560-03-09'),
+(161, 334, '12:15:00', '2559-11-11'),
+(162, 334, '12:15:00', '2560-04-01'),
+(163, 335, '12:15:00', '2559-08-08'),
+(164, 335, '12:15:00', '2560-01-01'),
+(165, 336, '00:00:00', '0000-00-00'),
+(166, 336, '00:00:00', '0000-00-00'),
+(167, 336, '00:00:00', '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -173,7 +217,8 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (44, 'Tak', 99.1258498, 16.8839901),
 (45, 'Suvarnabhumi Airport', 100.75011239999999, 13.689999100000001),
 (46, 'Thammasat University', 100.4923209, 13.7565121),
-(47, 'Computer Engineering Department', 33.908290199999996, 35.1461468);
+(47, 'Computer Engineering Department', 33.908290199999996, 35.1461468),
+(48, 'KASIKORNBANK', 100.5296888, 13.743412200000003);
 
 -- --------------------------------------------------------
 
@@ -187,28 +232,40 @@ CREATE TABLE `reminder` (
   `type` varchar(10) DEFAULT NULL,
   `notification` varchar(10) NOT NULL,
   `allday` int(1) DEFAULT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `start_time` time DEFAULT NULL,
-  `end_time` time DEFAULT NULL,
+  `start_date` varchar(20) NOT NULL,
+  `end_date` varchar(20) NOT NULL,
+  `start_time` varchar(20) DEFAULT NULL,
+  `end_time` varchar(20) DEFAULT NULL,
   `placename` varchar(64) NOT NULL,
   `latitude` double NOT NULL,
   `longtitude` double NOT NULL,
   `taskname` varchar(64) NOT NULL,
+  `subtaskname` text,
   `complete` tinyint(1) NOT NULL,
-  `timestamp_complete` datetime DEFAULT NULL
+  `timestamp_complete` datetime DEFAULT NULL,
+  `total` int(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `reminder`
 --
 
-INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `complete`, `timestamp_complete`) VALUES
-(309, 27, 'Location', 'Arrive', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'shopping', 1, '2561-04-01 22:45:22'),
-(311, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', 1, '2561-04-01 22:41:54'),
-(312, 49, 'Location', 'pass', NULL, '0000-00-00', '0000-00-00', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'Study', 0, NULL),
-(313, 27, 'Event', '', 1, '2561-04-19', '2561-04-26', NULL, NULL, 'null', 0, 0, 'Meeting', 0, NULL),
-(315, 27, 'Reminder', '', 1, '2561-04-17', '2561-04-19', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'fresh food', 0, NULL);
+INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `subtaskname`, `complete`, `timestamp_complete`, `total`) VALUES
+(323, 27, 'Reminder', '', 1, '2561-01-21', '2561-05-25', NULL, NULL, 'null', 0, 0, 'fresh food', 'apple', 0, '2561-04-02 21:57:02', 70),
+(324, 27, 'Reminder', '', 1, '2561-02-22', '2561-05-24', NULL, NULL, 'null', 0, 0, 'food', 'snack', 0, NULL, NULL),
+(325, 27, 'Reminder', '', 1, '2561-04-01', '2561-04-03', NULL, NULL, 'null', 0, 0, 'fresh food', 'apple', 1, '2561-04-02 22:01:52', 2),
+(326, 27, 'Event', '', 0, '2561-04-26', '2561-04-26', '04:30:00', '06:30:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'meeting', NULL, 0, NULL, NULL),
+(327, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', NULL, 1, '2561-04-02 22:35:37', NULL),
+(328, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'learning', NULL, 0, NULL, NULL),
+(329, 49, 'Reminder', '', 0, '2560-04-10', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'food', 'orange', 1, '2561-04-02 22:37:26', 357),
+(330, 27, 'Event', '', 1, '2561-04-19', '2561-04-27', NULL, NULL, 'KASIKORNBANK', 13.743412200000003, 100.5296888, 'bank', NULL, 1, '2561-04-03 15:59:46', NULL),
+(331, 49, 'Event', '', 1, '2560-02-19', '2560-10-25', NULL, NULL, 'Chon Buri', 13.361143099999998, 100.98467169999999, 'doing', NULL, 0, NULL, NULL),
+(332, 49, 'Reminder', '', 0, '2560-04-02', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'food', 'orange', 1, '2561-04-03 01:04:59', 366),
+(333, 49, 'Event', '', 0, '2560-03-02', '2560-10-25', '12:00:00', '14:15:00', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'doing', NULL, 0, NULL, NULL),
+(334, 49, 'Reminder', '', 0, '2560-04-10', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'freshfood', 'orange', 0, NULL, NULL),
+(335, 49, 'Reminder', '', 0, '2560-01-10', '2560-05-30', '12:15:00', '19:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'freshfood', '', 0, NULL, NULL),
+(336, 27, 'Reminder', '', 0, '2561-03-26', '2561-04-04', '05:30:00', '05:55:00', 'null', 0, 0, 'food', '', 0, NULL, NULL),
+(337, 27, 'Location', 'Depart', NULL, '', '', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'root ', NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -233,7 +290,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', 'Trcw6cJqrHkw47EMZ'),
+(27, 'test', 'test1234', 'test1234@test.com', 'w8FCTnya3RjJ7TzJs'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -325,22 +382,22 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `catalog`
 --
 ALTER TABLE `catalog`
-  MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 --
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=316;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=338;
 --
 -- AUTO_INCREMENT for table `user`
 --
