@@ -92,10 +92,6 @@ router.post('/edit', (req,res) => {
         period_type_date_new: req.body.period_type_date_new
     }
 
-    // var period_split = (catalog_input.period).split(" ", 2);
-    // var period_num = period_split[0];
-    // var period_type_date = period_split[1];
-
     if(
         catalog_id
         && catalog_output
@@ -134,7 +130,7 @@ router.post('/edit', (req,res) => {
                     }
                 });
             }
-        });
+        }); 
     }else {
         res.send({
             status: 403,
@@ -171,65 +167,209 @@ router.post('/remove', (req,res) => {
 router.post('/update', (req,res) => {
     var catalog_id = req.body.catalog_id;
 
-    connection.query('SELECT * FROM catalog WHERE _id = ?', [catalog_id], function(err,rows){
-        if(err){
-            res.send({
-                status: 400,
-                msg: 'catalog/update : there are some error with query select catalog'
-            });
-        }else {
-            if(rows.length > 0) {
-                if(rows[0].real_period_num != null && rows[0].real_period_type_date != null) {
-                    console.log(rows[0].real_period_num + " " + rows[0].real_period_type_date);
-                    var new_period_num = rows[0].real_period_num;
-                    var new_period_type_date = rows[0].real_period_type_date;
-                    connection.query('UPDATE catalog SET period_num = ?, period_type_date = ? WHERE _id = ?', [new_period_num, new_period_type_date, catalog_id], function(err,rows){
-                        if(err){
-                            res.send({
-                                status: 400,
-                                msg: 'catalog/update : there are some error with query update catalog'
-                            });
-                        }else {
-                            res.send({
-                                status: 200,
-                                msg: 'catalog/update : update period complete'
-                            });
-                        }
-                    });
+    if(catalog_id) {
+        connection.query('SELECT * FROM catalog WHERE _id = ?', [catalog_id], function(err,rows){
+            if(err){
+                res.send({
+                    status: 400,
+                    msg: 'catalog/update : there are some error with query select catalog'
+                });
+            }else {
+                if(rows.length > 0) {
+                    if(rows[0].real_period_num != null && rows[0].real_period_type_date != null) {
+                        console.log(rows[0].real_period_num + " " + rows[0].real_period_type_date);
+                        var new_period_num = rows[0].real_period_num;
+                        var new_period_type_date = rows[0].real_period_type_date;
+                        connection.query('UPDATE catalog SET period_num = ?, period_type_date = ? WHERE _id = ?', [new_period_num, new_period_type_date, catalog_id], function(err,rows){
+                            if(err){
+                                res.send({
+                                    status: 400,
+                                    msg: 'catalog/update : there are some error with query update catalog'
+                                });
+                            }else {
+                                res.send({
+                                    status: 200,
+                                    msg: 'catalog/update : update period complete'
+                                });
+                            }
+                        });
+                    }else {
+                        res.send({
+                            status: 400,
+                            msg: 'catalog/update : period = null'
+                        });
+                    }
                 }else {
                     res.send({
                         status: 400,
-                        msg: 'catalog/update : period = null'
+                        msg: 'catalog/update : dont have catalog_id in database'
                     });
                 }
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: "catalog/update : permission denied"
+        });
+    }
+});
+
+router.post('/showreminder', (req,res) => {
+    var type = req.body.type;
+
+    connection.query(`SELECT * FROM reminder WHERE complete = '1' AND type = 'Reminder' AND taskname LIKE '%` + type + `%' ORDER BY timestamp_complete DESC`, function(err,rows) {
+        if(err){
+            res.send({
+                status: 400,
+                msg: 'catalog/showreminder : there are some error with query select reminder'
+            });
+        }else {
+            var data = rows;
+            if(rows.length > 0) {
+                data.forEach(element => {
+                    var timestamp_complete = element.timestamp_complete;
+                    var timestamp_complete_bc = new Date(timestamp_complete.setFullYear(timestamp_complete.getFullYear() - 543));
+                    var msec_timestamp_complete = timestamp_complete_bc.getTime();
+
+                    var start = element.start_date.split('-');
+                    var year = start[0] - 543;
+                    var month = start[1] - 1;
+                    var date = start[2];
+                    var hr = 0;
+                    var min = 0;
+
+                    if(element.start_time) {
+                        var time = element.start_time.split(':');
+                        hr = time[0];
+                        min = time[1];
+                    }
+                    
+                    var msec_start_date = (new Date(year, month, date, hr, min, 0, 0)).getTime();
+
+                    var total_sec = (msec_timestamp_complete - msec_start_date) / 1000;
+                    var total_db;
+
+                    console.log('sec : ' + total_sec);
+
+                    if(total_sec > 60) {
+                        var mins = total_sec / 60;
+                        if(mins > 60) {
+                            var hrs = mins / 60;
+                            if(hrs > 24) {
+                                var days = Math.round(hrs / 24);
+                                console.log("DAYS : " + days);
+                                total_db = days;
+                            }else {
+                                total_db = 0;
+                            }
+                        }else{
+                            total_db = 0;
+                        }
+                    }else {
+                        total_db = 0;
+                    }
+                    connection.query(`UPDATE reminder SET total = '` + total_db + `' WHERE _id = '` + element._id + `'`, function(err,rows){
+                        if(err){
+                            res.send({
+                                status: 400,
+                                msg: 'catalog/showreminder : there are some error with query update reminder'
+                            });
+                        }else {
+                            console.log('reminde_id = ' + element._id + ' / ' + 'total = ' + total_db);
+                        }
+                    });
+                });
+                res.send({
+                    status: 200,
+                    data: rows,
+                    msg: 'catalog/showreminder : complete length > 0'
+                });
             }else {
                 res.send({
-                    status: 400,
-                    msg: 'catalog/update : dont have catalog_id in database'
+                    status: 200,
+                    data: rows,
+                    msg: 'catalog/showreminder : complete length = 0'
                 });
             }
         }
     });
 });
 
-router.post('/show', (req,res) => {
-    var type = req.body.type;
-    connection.query(`SELECT * FROM reminder WHERE complete = '1' AND type = 'Reminder' ORDER BY timestamp_complete DESC`, function(err,rows) {
+router.post('/showcatalog', (req,res) => {
+    connection.query(`SELECT * FROM catalog`, function(err,rows) {
         if(err){
             res.send({
                 status: 400,
-                msg: 'catalog/show : there are some error with query select reminder'
+                msg: 'catalog/showcatalog : there are some error with query select catalog'
             });
         }else {
             res.send({
                 status: 200,
                 data: rows,
-                msg: 'catalog/show : complete'
+                msg: 'catalog/showcatalog : complete'
             });
         }
     });
-    // var data = rows;
-    // data.forEach(element => {
-    //     element.period = element.period_num + " " + element.period_type_date;
-    // });
+});
+
+router.post('/avg', (req, res) => {
+    connection.query(`SELECT * FROM catalog`, function(err,rows_catalog) {
+        if(err){
+            res.send({
+                status: 400,
+                msg: 'catalog/avg : there are some error with query select catalog'
+            });
+        }else {
+            var data_catalog = rows_catalog;
+            data_catalog.forEach(element => {
+                var task = element.type;
+                var subtask = element.item;
+                
+                connection.query(`SELECT * FROM reminder WHERE complete = '1' AND taskname LIKE '` + task + `' AND subtaskname LIKE '` + subtask + `'`, function(err,rows_reminder) {
+                    if(err){
+                        res.send({
+                            status: 400,
+                            msg: 'catalog/avg : there are some error with query select reminder'
+                        });
+                    }else {
+                        console.log('task : ' + task + ' subtask : ' + subtask)
+                        console.log(rows_reminder);
+                        if(rows_reminder.length > 0) {
+                            var data_reminder = rows_reminder;
+
+                            var loop = 0;
+                            var sum_total = 0;
+    
+                            data_reminder.forEach(element_reminder => {
+                                var total = element_reminder.total;
+                                
+                                sum_total = sum_total + total;
+                                loop++;
+                            });
+                            var avg = sum_total / loop;
+                            console.log('AVG : ' + avg);
+                            connection.query(`UPDATE catalog SET real_period_type_date = 'days' ,real_period_num = '` + avg + `' WHERE _id = '` + element._id + `'`, function(err,rows){
+                                if(err){
+                                    res.send({
+                                        status: 400,
+                                        msg: 'catalog/avg : there are some error with query update catalog'
+                                    });
+                                }else {
+                                    console.log('update complete');
+                                }
+                            });
+                        }else {
+                            console.log('AVG : dont have data');
+                        }
+                    }
+                })
+            });
+            res.send({
+                status: 200,
+                data: rows_catalog,
+                msg: 'catalog/avg : complete'
+            });
+        }
+    });
 });

@@ -3,6 +3,7 @@ const router = app.Router();
 const random = require('meteor-random');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
+const moment = require('moment');
 module.exports = router;
 
 var connection = mysql.createConnection({
@@ -227,6 +228,7 @@ router.post('/event', (req,res) => {
                 if(rows.length > 0) {
                     console.log("user_id : " + rows[0]._id);
                     var id = rows[0]._id;
+
                     if(reminder_event.allday == "0") {
                         if(
                             reminder_event.starthour 
@@ -400,6 +402,7 @@ router.post('/reminder', (req,res) => {
         endmin: req.body.endmin,
         placename: req.body.placename,
         taskname: req.body.taskname,
+        subtaskname: req.body.subtaskname,
         complete: req.body.complete
     }
 
@@ -493,7 +496,7 @@ router.post('/reminder', (req,res) => {
                             var enddate = end.toLocaleDateString();
                             var endtime = end.toLocaleTimeString();
 
-                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
+                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, subtaskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.subtaskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
                                 if(err) {
                                     res.send({
                                         status: 400,
@@ -575,7 +578,8 @@ router.post('/reminder', (req,res) => {
                                     }
                                     res.send({
                                         status: 200,
-                                        msg: 'addreminder/reminder : allday = 1 : insert notification complete'
+                                        data: rows,
+                                        msg: 'addreminder/reminder : allday = 0 : insert notification complete'
                                     });
                                 }
                             });
@@ -605,7 +609,7 @@ router.post('/reminder', (req,res) => {
                             var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate);
                             var enddate = end.toLocaleDateString();
                             
-                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "1", "'  + startdate + '", "' + enddate + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
+                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, placename, latitude, longtitude, taskname, subtaskname, complete) VALUES ("' + id + '", "' + reminder_reminder.type + '", "1", "'  + startdate + '", "' + enddate + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.subtaskname + '", "' + reminder_reminder.complete +'")', function(err,rows){
                                 if(err) {
                                     res.send({
                                         status: 400,
@@ -688,6 +692,7 @@ router.post('/reminder', (req,res) => {
                                     }
                                     res.send({
                                         status: 200,
+                                        data: rows,
                                         msg: 'addreminder/reminder : allday = 1 : insert notification success'
                                     });
                                 }
