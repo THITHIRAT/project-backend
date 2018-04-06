@@ -15,6 +15,15 @@ app.use('/users', user);
 var addreminder = require('./route/addreminder.js');
 app.use('/addreminder', addreminder);
 
+var deletereminder = require('./route/deletereminder.js');
+app.use('/deletereminder', deletereminder);
+
+var detailreminder = require('./route/detailreminder.js');
+app.use('/detailreminder', detailreminder);
+
+var updatereminder = require('./route/updatereminder.js');
+app.use('/updatereminder', updatereminder);
+
 var place = require('./route/place.js');
 app.use('/place', place);
 

@@ -39,10 +39,6 @@ router.post('/task', (req,res) => {
                 });
             }
         });
-        // res.send({
-        //     status: 403,
-        //     msg: "complete/task : permission denied"
-        // });
     }else {
         res.send({
             status: 403,
