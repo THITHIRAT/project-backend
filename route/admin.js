@@ -46,6 +46,6 @@ router.post('/login', (req,res) => {
         res.send({
             status: 403,
             msg: "admin/login : permission denied"
-        })
+        });
     }
 });
