@@ -322,6 +322,24 @@ router.post('/showreminder', (req,res) => {
     });
 });
 
+router.post('/showlocation', (req,res) => {
+    connection.query(`SELECT * FROM reminder WHERE type = 'Location'`, function(err,rows_reminder){
+        if(err){
+            res.send({
+                status: 400,
+                msg: 'catalog/showlocation : there are some error with query select reminder'
+            });
+        }else {
+            res.send({
+                status: 200,
+                data: rows_reminder,
+                msg: 'catalog/showlocation : complete'
+            });
+            
+        }
+    });
+});
+
 router.post('/showcatalog', (req,res) => {
     connection.query(`SELECT * FROM catalog`, function(err,rows_catalog) {
         if(err){
