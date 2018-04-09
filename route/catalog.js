@@ -379,6 +379,7 @@ router.post('/showcatalog', (req,res) => {
             });
             res.send({
                 status: 200,
+                data: rows_catalog,
                 msg: 'catalog/showcatalog : complete'
             });
         }
