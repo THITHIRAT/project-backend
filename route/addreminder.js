@@ -20,6 +20,64 @@ router.use(bodyParser.urlencoded({
     extended : false
 }));
 
+function count_reminder(end, before_after, num, type){
+    var msec_end = end.getTime();
+    var temp = 0;
+
+    if(type == "Mins") {
+        temp = parseInt(num) * 60 * 1000;
+    }
+    else if(type == "Hrs") {
+        temp = parseInt(num) * 60 * 60 * 1000;
+    }
+    else if(type == "Days") {
+        temp = parseInt(num) * 24 * 60 * 60 * 1000;
+    }
+    else if(type == "Mths") {
+        console.log("Start Date : " + (end.getMonth() + 1));
+        var loop = parseInt(num);
+        for(var i=0; i<loop; i++) {
+            var num_month = end.getMonth();
+            if(num_month == 0 || num_month == 2 || num_month == 4 || num_month == 6 || num_month == 7 || num_month == 9 || num_month == 11) {
+                temp = temp + 2678400000;
+                num_month++;
+            }
+            else if(num_month == 3 || num_month == 5 || num_month == 8 || num_month == 10) {
+                temp = temp + 2592000000;
+                num_month++;
+            }
+            else if(num_month == 1) {
+                if((end.getFullYear() + 1)%4 == 0) {
+                    temp = temp + 2505600000;
+                    num_month++;
+                }else {
+                    temp = temp + 2419200000;
+                    num_month++;
+                }
+            }
+        }
+    }
+    else if(type == "Yrs") {
+        if((end.getFullYear() +1)%4 == 0) {
+            temp = temp + 31622400000;
+        }else {
+            temp = temp + 31536000000;
+        }
+    }
+
+    var notification = msec_end - temp;
+
+    if(notification) {
+        var notification_date = new Date(notification);
+        console.log("Notification Date : " + notification_date);
+    }else {
+        var notification_date = null;
+        console.log("Notification Date : " + notification_date);
+    }
+    
+    return notification_date;
+}
+
 function count_milliseconds(start, end, before_after, num, type){
     var msec_start = start.getTime();
     var msec_end = end.getTime();
@@ -396,17 +454,15 @@ router.post('/event', (req,res) => {
 router.post('/reminder', (req,res) => {
     var reminder_reminder = {
         type: req.body.type,
-        allday: req.body.allday,
         startdate: req.body.startdate,
         startmonth: req.body.startmonth,
         startyear: req.body.startyear,
         enddate: req.body.enddate,
         endmonth: req.body.endmonth,
         endyear: req.body.endyear,
-        starthour: req.body.starthour,
-        startmin: req.body.startmin,
-        endhour: req.body.endhour,
-        endmin: req.body.endmin,
+        purchasedate: req.body.purchasedate,
+        purchasemonth: req.body.puechasemonth,
+        purchaseyear: req.body.purchaseyear,
         placename: req.body.placename,
         taskname: req.body.taskname,
         subtaskname: req.body.subtaskname,
@@ -435,21 +491,9 @@ router.post('/reminder', (req,res) => {
 
     var longtitude, latitude;
     var reminder_id;
-    var date_notification_table, time_notification_table;
+    var date_notification_table;
 
-    if(
-        token
-        && reminder_reminder.type
-        && reminder_reminder.allday
-        && reminder_reminder.startdate
-        && reminder_reminder.startmonth
-        && reminder_reminder.startyear
-        && reminder_reminder.enddate
-        && reminder_reminder.endmonth
-        && reminder_reminder.endyear
-        && reminder_reminder.taskname
-        && reminder_reminder.complete
-    ){
+    if(reminder_reminder.placename) {
         connection.query('SELECT * FROM place WHERE name = ?', reminder_reminder.placename, function(err, row) {
             if(err) {
                 res.send({
@@ -468,6 +512,17 @@ router.post('/reminder', (req,res) => {
                 console.log("Place name : " + reminder_reminder.placename + " \nLatitude : " + latitude + " && Longtitude : " + longtitude);
             }
         });
+    }
+
+    if(
+        token
+        && reminder_reminder.type
+        && reminder_reminder.enddate
+        && reminder_reminder.endmonth
+        && reminder_reminder.endyear
+        && reminder_reminder.taskname
+        && reminder_reminder.complete
+    ){
         connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
             if(err) {
                 res.send({
@@ -478,225 +533,97 @@ router.post('/reminder', (req,res) => {
                 if(rows.length > 0){
                     console.log("user_id : " + rows[0]._id);
                     var id = rows[0]._id;
-                    if(reminder_reminder.allday == "0") {
-                       if(
-                            reminder_reminder.starthour
-                            && reminder_reminder.startmin
-                            && reminder_reminder.startdate
-                            && reminder_reminder.startmonth
-                            && reminder_reminder.startyear
-                            && reminder_reminder.endhour 
-                            && reminder_reminder.endmin
-                            && reminder_reminder.enddate
-                            && reminder_reminder.endmonth
-                            && reminder_reminder.endyear 
-                       ){
-                            var int_startmonth = parseInt(reminder_reminder.startmonth) - 1;
-                            var int_startyear = reminder_reminder.startyear;
-                            var start = new Date(int_startyear, int_startmonth, reminder_reminder.startdate, reminder_reminder.starthour, reminder_reminder.startmin);
-                            var msec_start = start.getTime();
-                            var startdate = start.toLocaleDateString();
-                            var starttime = start.toLocaleTimeString();
+                    if(
+                        reminder_reminder.enddate
+                        && reminder_reminder.endmonth
+                        && reminder_reminder.endyear 
+                    ){
+                        var int_endmonth = parseInt(reminder_reminder.endmonth) - 1;
+                        var int_endyear = reminder_reminder.endyear;
+                        var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate);
+                        var msec_end = end.getTime();
+                        var enddate = end.toLocaleDateString();
 
-                            var int_endmonth = parseInt(reminder_reminder.endmonth) - 1;
-                            var int_endyear = reminder_reminder.endyear;
-                            var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate, reminder_reminder.endhour, reminder_reminder.endmin);
-                            var msec_end = end.getTime();
-                            var enddate = end.toLocaleDateString();
-                            var endtime = end.toLocaleTimeString();
-
-                            var total_sec = (msec_end - msec_start) / 1000;
-                            var total_min;
-                            var total_hrs;
-                            var total_day;
-                            var total_db = 0;
-
-                            if(total_sec > 60) {
-                                total_min = total_sec / 60;
-                                if(total_min > 60) {
-                                    total_hrs = total_min / 60;
-                                    if(total_hrs > 24) {
-                                        total_day = Math.round(total_hrs / 24);
-                                        console.log("Days : " + total_day);
-                                        total_db = total_day;
-                                    }
-                                }
-                            }
-
-                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, subtaskname, complete, total) VALUES ("' + id + '", "' + reminder_reminder.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.subtaskname + '", "' + reminder_reminder.complete + '", "' + total_db +'")', function(err,rows){
-                                if(err) {
-                                    res.send({
-                                        status: 400,
-                                        msg: 'addreminder/reminder : allday = 0 : there are some error with query select add reminder'
-                                    });
-                                }else {
-                                    console.log("Reminder_id : " + rows.insertId);
-                                    reminder_id = rows.insertId;
-                                    if(notification_datetime_1){
-                                        var num = parseInt(notification_datetime_1.num_notification_1);
-                                       
-                                        if (num == 0) {
-                                            console.log("notification_datetime_1 : num = 0");
-                                        }else {
-                                            var notification_date_1 = count_milliseconds(start, end, notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
-
-                                            if(notification_date_1 == null) {
-                                                console.log("notification_datetime_1 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_1.toLocaleTimeString();
-                                                var date_notification_table = notification_date_1.toLocaleDateString();
-        
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : allday = 0 : there are some error with insert notification 1'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_1 : success");
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-
-                                    if(notification_datetime_2){
-                                        var num = parseInt(notification_datetime_2.num_notification_2);
-
-                                        if (num == 0) {
-                                            console.log("notification_datetime_2 : num = 0");
-                                        }else {
-                                            var notification_date_2 = count_milliseconds(start, end, notification_datetime_2.before_after_2, num, notification_datetime_2.type_num_2);
-
-                                            if(notification_date_2 == null) {
-                                                console.log("notification_datetime_2 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_2.toLocaleTimeString();
-                                                var date_notification_table = notification_date_2.toLocaleDateString();
-        
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 +`")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'allday = 0 : there are some error with insert notification 2'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_2 : success");
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-
-                                    if(notification_datetime_3){
-                                        var num = parseInt(notification_datetime_3.num_notification_3);
-
-                                        if (num == 0) {
-                                            console.log("notification_datetime_3 : num = 0");
-                                        }else {
-                                            var notification_date_3 = count_milliseconds(start, end, notification_datetime_3.before_after_3, num, notification_datetime_3.type_num_3);
-
-                                            if(notification_date_3 == null) {
-                                                console.log("notification_datetime_3 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_3.toLocaleTimeString();
-                                                var date_notification_table = notification_date_3.toLocaleDateString();
-    
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + notification_datetime_3.type_num_3 +`")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : allday = 0 : there are some error with insert notification 3'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_3 : success");
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }
-                                    res.send({
-                                        status: 200,
-                                        data: rows,
-                                        msg: 'addreminder/reminder : allday = 0 : insert notification complete'
-                                    });
-                                }
-                            });
-                       }else {
-                        res.send({
-                            status: 400,
-                            msg: 'addreminder/reminder : allday = 0 : dont have days hrs mins'
-                        });
-                       }
-                    }
-                    if(reminder_reminder.allday == "1") {
+                        var msec_date;
                         if(
                             reminder_reminder.startdate
                             && reminder_reminder.startmonth
                             && reminder_reminder.startyear
-                            && reminder_reminder.enddate
-                            && reminder_reminder.endmonth
-                            && reminder_reminder.endyear 
                         ){
                             var int_startmonth = parseInt(reminder_reminder.startmonth) - 1;
                             var int_startyear = reminder_reminder.startyear;
                             var start = new Date(int_startyear, int_startmonth, reminder_reminder.startdate);
                             var msec_start = start.getTime();
                             var startdate = start.toLocaleDateString();
+                            msec_date = msec_start;
+                        }else {
+                            startdate = null;
+                            var now = new Date();
+                            var msec_now = now.getTime();
+                            msec_date = msec_now;
+                        }
 
-                            var int_endmonth = parseInt(reminder_reminder.endmonth) - 1;
-                            var int_endyear = reminder_reminder.endyear;
-                            var end = new Date(int_endyear, int_endmonth, reminder_reminder.enddate);
-                            var msec_end = end.getTime();
-                            var enddate = end.toLocaleDateString();
+                        var total_sec = (msec_end - msec_date) / 1000;
+                        var total_min;
+                        var total_hrs;
+                        var total_day;
+                        var total_db = 0;
 
-                            var total_sec = (msec_end - msec_start) / 1000;
-                            var total_min;
-                            var total_hrs;
-                            var total_day;
-                            var total_db = 0;
-
-                            if(total_sec > 60) {
-                                total_min = total_sec / 60;
-                                if(total_min > 60) {
-                                    total_hrs = total_min / 60;
-                                    if(total_hrs > 24) {
-                                        total_day = Math.round(total_hrs / 24);
-                                        console.log("Days : " + total_day);
-                                        total_db = total_day;
-                                    }
+                        if(total_sec > 60) {
+                            total_min = total_sec / 60;
+                            if(total_min > 60) {
+                                total_hrs = total_min / 60;
+                                if(total_hrs > 24) {
+                                    total_day = Math.round(total_hrs / 24);
+                                    console.log("Days : " + total_day);
+                                    total_db = total_day;
                                 }
                             }
+                        }
+                        
+                        var purchase = new Date();
+                        var purchase_table = purchase.toLocaleDateString();
 
-                            connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, placename, latitude, longtitude, taskname, subtaskname, complete, total) VALUES ("' + id + '", "' + reminder_reminder.type + '", "1", "'  + startdate + '", "' + enddate + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.subtaskname + '", "' + reminder_reminder.complete + '", "' + total_db +'")', function(err,rows){
-                                if(err) {
-                                    res.send({
-                                        status: 400,
-                                        msg: 'addreminder/reminder : allday = 1 : there are some error with query select add reminder'
-                                    });
-                                }else {
-                                    console.log("Reminder_id : " + rows.insertId);
-                                    reminder_id = rows.insertId;
+                        connection.query('INSERT INTO reminder (user_id, type, start_date, purchase_date, end_date, placename, latitude, longtitude, taskname, subtaskname, complete, total) VALUES ("' + id + '", "' + reminder_reminder.type + '", "'  + startdate + '", "' + purchase_table + '" , "' + enddate + '", "' + reminder_reminder.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_reminder.taskname + '", "' + reminder_reminder.subtaskname + '", "' + reminder_reminder.complete + '", "' + total_db +'")', function(err,rows){
+                            if(err) {
+                                res.send({
+                                    status: 400,
+                                    msg: 'addreminder/reminder : there are some error with query select add reminder'
+                                });
+                            }else {
+                                console.log("Reminder_id : " + rows.insertId);
+                                reminder_id = rows.insertId;
+                                if(notification_datetime_1){
+                                    var num = parseInt(notification_datetime_1.num_notification_1);
+                                    
+                                    if (num == 0) {
+                                        console.log("notification_datetime_1 : num = 0");
+                                    }else {
+                                        var notification_date_1 = count_reminder(end, notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
 
-                                    if(notification_datetime_1){
-                                        var num = parseInt(notification_datetime_1.num_notification_1);
-
-                                        if (num == 0) {
-                                            console.log("notification_datetime_1 : num = 0");
+                                        if(notification_date_1 == null) {
+                                            console.log("notification_datetime_1 : not success");
                                         }else {
-                                            var notification_date_1 = count_milliseconds(start, end, notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
+                                            var date_notification_table = notification_date_1.toLocaleDateString();
 
-                                            if(notification_date_1 == null) {
-                                                console.log("notification_datetime_1 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_1.toLocaleTimeString();
-                                                var date_notification_table = notification_date_1.toLocaleDateString();
-        
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 +`")`, function(err, rows) {
+                                            if(req.body.time) {
+                                                var time_notification = req.body.time;
+                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
                                                     if(err) {
                                                         res.send({
                                                             status: 400,
-                                                            msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 1'
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 1'
+                                                        });
+                                                    }else {
+                                                        console.log("notification_datetime_1 : success");
+                                                    }
+                                                });
+                                            }else {
+                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 1'
                                                         });
                                                     }else {
                                                         console.log("notification_datetime_1 : success");
@@ -705,26 +632,39 @@ router.post('/reminder', (req,res) => {
                                             }
                                         }
                                     }
+                                }
 
-                                    if(notification_datetime_2){
-                                        var num = parseInt(notification_datetime_2.num_notification_2);
+                                if(notification_datetime_2){
+                                    var num = parseInt(notification_datetime_2.num_notification_2);
 
-                                        if (num == 0) {
-                                            console.log("notification_datetime_2 : num = 0");
+                                    if (num == 0) {
+                                        console.log("notification_datetime_2 : num = 0");
+                                    }else {
+                                        var notification_date_2 = count_reminder(start, end, notification_datetime_2.before_after_2, num, notification_datetime_2.type_num_2);
+
+                                        if(notification_date_2 == null) {
+                                            console.log("notification_datetime_2 : not success");
                                         }else {
-                                            var notification_date_2 = count_milliseconds(start, end, notification_datetime_2.before_after_2, num, notification_datetime_2.type_num_2);
+                                            var date_notification_table = notification_date_2.toLocaleDateString();
 
-                                            if(notification_date_2 == null) {
-                                                console.log("notification_datetime_2 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_2.toLocaleTimeString();
-                                                var date_notification_table = notification_date_2.toLocaleDateString();
-
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 +`")`, function(err, rows) {
+                                            if(req.body.time) {
+                                                var time_notification = req.body.time;
+                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id + `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
                                                     if(err) {
                                                         res.send({
                                                             status: 400,
-                                                            msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 2'
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 2'
+                                                        });
+                                                    }else {
+                                                        console.log("notification_datetime_2 : success");
+                                                    }
+                                                });
+                                            }else {
+                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 2'
                                                         });
                                                     }else {
                                                         console.log("notification_datetime_2 : success");
@@ -733,26 +673,39 @@ router.post('/reminder', (req,res) => {
                                             }
                                         }
                                     }
+                                }
 
-                                    if(notification_datetime_3){
-                                        var num = parseInt(notification_datetime_3.num_notification_3);
+                                if(notification_datetime_3){
+                                    var num = parseInt(notification_datetime_3.num_notification_3);
 
-                                        if (num == 0) {
-                                            console.log("notification_datetime_3 : num = 0");
+                                    if (num == 0) {
+                                        console.log("notification_datetime_3 : num = 0");
+                                    }else {
+                                        var notification_date_3 = count_reminder(start, end, notification_datetime_3.before_after_3, num, notification_datetime_3.type_num_3);
+
+                                        if(notification_date_3 == null) {
+                                            console.log("notification_datetime_3 : not success");
                                         }else {
-                                            var notification_date_3 = count_milliseconds(start, end, notification_datetime_3.before_after_3, num, notification_datetime_3.type_num_3);
+                                            var date_notification_table = notification_date_3.toLocaleDateString();
 
-                                            if(notification_date_3 == null) {
-                                                console.log("notification_datetime_3 : not success");
-                                            }else {
-                                                var time_notification_table = notification_date_3.toLocaleTimeString();
-                                                var date_notification_table = notification_date_3.toLocaleDateString();
-        
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("` + reminder_id + `", "` + time_notification_table + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + notification_datetime_3.type_num_3 +`")`, function(err, rows) {
+                                            if(req.body.time) {
+                                                var time_notification = req.body.time;
+                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id + `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
                                                     if(err) {
                                                         res.send({
                                                             status: 400,
-                                                            msg: 'addreminder/reminder : allday = 1 : there are some error with insert notification 3'
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 3'
+                                                        });
+                                                    }else {
+                                                        console.log("notification_datetime_3 : success");
+                                                    }
+                                                });
+                                            }else {
+                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'addreminder/reminder : there are some error with insert notification 3'
                                                         });
                                                     }else {
                                                         console.log("notification_datetime_3 : success");
@@ -761,24 +714,24 @@ router.post('/reminder', (req,res) => {
                                             }
                                         }
                                     }
-                                    res.send({
-                                        status: 200,
-                                        data: rows,
-                                        msg: 'addreminder/reminder : allday = 1 : insert notification success'
-                                    });
                                 }
-                            });
-                        }else {
-                            res.send({
-                                status: 400,
-                                msg: 'addreminder/reminder : allday = 0 : dont have days hrs mins'
-                            });
-                        }
-                     }
+                                res.send({
+                                    status: 200,
+                                    data: rows,
+                                    msg: 'addreminder/reminder : complete'
+                                });
+                            }
+                        });
+                    }else {
+                        res.send({
+                            status: 400,
+                            msg: 'addreminder/reminder : dont have end date'
+                        });
+                    } 
                 }else {
                     res.send({
                         status: 400,
-                        msg: 'addreminder/reminder : this token dont have user'
+                        msg: 'addreminder/reminder : dont have token'
                     });
                 }
             }

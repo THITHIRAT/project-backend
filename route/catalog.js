@@ -287,6 +287,23 @@ router.post('/update_mode', (req,res) => {
     }
 });
 
+router.post('/showallreminder', (req,res) => {
+    connection.query(`SELECT * FROM reminder WHERE complete = "1" AND type = "Reminder"`, function(err,rows){
+        if(err){
+            res.send({
+                status: 400,
+                msg: 'catalog/showallreminder : there are some error with query select reminder'
+            });
+        }else {
+            res.send({
+                status: 400,
+                data: rows,
+                msg: 'catalog/showallreminder : there are some error with query select reminder'
+            });
+        }
+    });
+});
+
 router.post('/showreminder', (req,res) => {
     var type = req.body.type;
 
@@ -390,6 +407,16 @@ router.post('/showcatalog', (req,res) => {
                                 }
                             });
                         }else {
+                            connection.query(`UPDATE catalog SET real_period_type_date = 'days', avg = '` + null + `', mode = '` + null + `' WHERE _id = '` + element._id + `'`, function(err,rows){
+                                if(err){
+                                    res.send({
+                                        status: 400,
+                                        msg: 'catalog/showcatalog : there are some error with query update catalog'
+                                    });
+                                }else {
+                                    console.log('update complete');
+                                }
+                            });
                             console.log('catalog/showcatalog : avg && mode - dont have data');
                         }
                     }
