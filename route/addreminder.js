@@ -20,8 +20,7 @@ router.use(bodyParser.urlencoded({
     extended : false
 }));
 
-function count_reminder(end, before_after, num, type){
-    var msec_end = end.getTime();
+function count_reminder(msec_end, before_after, num, type){
     var temp = 0;
 
     if(type == "Mins") {
@@ -34,7 +33,7 @@ function count_reminder(end, before_after, num, type){
         temp = parseInt(num) * 24 * 60 * 60 * 1000;
     }
     else if(type == "Mths") {
-        console.log("Start Date : " + (end.getMonth() + 1));
+        console.log("End Date Months : " + (end.getMonth() + 1));
         var loop = parseInt(num);
         for(var i=0; i<loop; i++) {
             var num_month = end.getMonth();
@@ -599,7 +598,8 @@ router.post('/reminder', (req,res) => {
                                     if (num == 0) {
                                         console.log("notification_datetime_1 : num = 0");
                                     }else {
-                                        var notification_date_1 = count_reminder(end, notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
+                                        console.log("notification_datetime_1 : " + num);
+                                        var notification_date_1 = count_reminder(msec_end, notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
 
                                         if(notification_date_1 == null) {
                                             console.log("notification_datetime_1 : not success");
@@ -640,7 +640,8 @@ router.post('/reminder', (req,res) => {
                                     if (num == 0) {
                                         console.log("notification_datetime_2 : num = 0");
                                     }else {
-                                        var notification_date_2 = count_reminder(start, end, notification_datetime_2.before_after_2, num, notification_datetime_2.type_num_2);
+                                        console.log("notification_datetime_2 : " + num);
+                                        var notification_date_2 = count_reminder(msec_end, notification_datetime_2.before_after_2, num, notification_datetime_2.type_num_2);
 
                                         if(notification_date_2 == null) {
                                             console.log("notification_datetime_2 : not success");
@@ -660,7 +661,7 @@ router.post('/reminder', (req,res) => {
                                                     }
                                                 });
                                             }else {
-                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
+                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
                                                     if(err) {
                                                         res.send({
                                                             status: 400,
@@ -681,7 +682,8 @@ router.post('/reminder', (req,res) => {
                                     if (num == 0) {
                                         console.log("notification_datetime_3 : num = 0");
                                     }else {
-                                        var notification_date_3 = count_reminder(start, end, notification_datetime_3.before_after_3, num, notification_datetime_3.type_num_3);
+                                        console.log("notification_datetime_3 : " + num);
+                                        var notification_date_3 = count_reminder(msec_end, notification_datetime_3.before_after_3, num, notification_datetime_3.type_num_3);
 
                                         if(notification_date_3 == null) {
                                             console.log("notification_datetime_3 : not success");
@@ -701,7 +703,7 @@ router.post('/reminder', (req,res) => {
                                                     }
                                                 });
                                             }else {
-                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
+                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + notification_datetime_3.type_num_3 + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
                                                     if(err) {
                                                         res.send({
                                                             status: 400,
@@ -739,10 +741,9 @@ router.post('/reminder', (req,res) => {
     }else {
         res.send({
             status: 400,
-            msg: 'addreminder reminder : data not enough'
+            msg: 'addreminder/reminder : data not enough'
         });
     }
-
 });
 
 router.post('/testdatetime', (req,res) => {
