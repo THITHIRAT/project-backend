@@ -55,7 +55,8 @@ router.post('/task', (req,res) => {
                                     var output = {
                                         before_after: rows_notification[i].before_after,
                                         number: rows_notification[i].number,
-                                        type: rows_notification[i].type
+                                        type: rows_notification[i].type,
+                                        time: rows_notification[i].time,
                                     }
                                     array_output[i] = output;
                                 }

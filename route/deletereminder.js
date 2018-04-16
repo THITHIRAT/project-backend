@@ -33,6 +33,18 @@ router.post('/task', (req,res) => {
             if(rows.length > 0) {
                 var taskname = rows[0].taskname;
                 var subtaskname = rows[0].subtaskname;
+                if(rows[0].type == "Reminder") {
+                    connection.query(`DELETE FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows){
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'deletereminder/task : there are some error with query delete notification for reminder'
+                            });
+                        }else {
+                            console.log("Delete Reminder Notification");
+                        }
+                    });
+                }
                 connection.query('DELETE FROM reminder WHERE _id = ?', [reminder_id], function(err,rows){
                     if(err) {
                         res.send({

@@ -405,11 +405,10 @@ router.post('/task', (req,res) => {
                 ){
                     var int_startmonth = parseInt(input.startmonth) - 1;
                     var int_startyear = parseInt(input.startyear);
-                    var start = new Date(int_startyear, int_startmonth, input.startdate, input.starthour, input.startmin, 0, 0);
+                    var start = new Date(int_startyear, int_startmonth, input.startdate);
                     var startdate = start.toLocaleDateString();
-                    var starttime = start.toLocaleTimeString();
-                    console.log("Input Start Date : " + input.startdate + "/" + input.startmonth + "/" + input.startyear + " \nInput Start Time : " + input.starthour + ":" + input.startmin + "\n" + startdate + " & " + starttime);
-                    connection(`UPDATE reminder SET start_date = '` + startdate + `' WHERE _id = '` + reminder_id `'`, function(err,rows) {
+                    console.log("Input Start Date : " + input.startdate + "/" + input.startmonth + "/" + input.startyear + "  &  " + startdate);
+                    connection.query(`UPDATE reminder SET start_date = '` + startdate + `' WHERE _id = '` + reminder_id + `'`, function(err,rows) {
                         if(err) {
                             res.send({
                                 status: 400,
@@ -423,10 +422,9 @@ router.post('/task', (req,res) => {
 
                 var int_endmonth = parseInt(input.endmonth) - 1;
                 var int_endyear = parseInt(input.endyear);
-                var end = new Date(int_endyear, int_endmonth, input.enddate, input.endhour, input.endmin, 0, 0);
+                var end = new Date(int_endyear, int_endmonth, input.enddate);
                 var enddate = end.toLocaleDateString();
-                var endtime = end.toLocaleTimeString();
-                console.log("Input End Date : " + input.enddate + "/" + input.endmonth + "/" + input.endyear + " \nInput End Time : " + input.endhour + ":" + input.endmin +  "\n" + enddate + " & " + endtime);
+                console.log("Input End Date : " + input.enddate + "/" + input.endmonth + "/" + input.endyear + "  &  " + enddate);
 
                 connection.query(`SELECT * FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows_selectnotification){
                     if(err) {
@@ -436,7 +434,6 @@ router.post('/task', (req,res) => {
                         });
                     }else {
                         console.log("Length : " + rows_selectnotification.length);
-                        console.log("typeof all day event : " + typeof(input.allday) + " - value : " + input.allday);
                         if(rows_selectnotification.length > 0) {
                             console.log("delete all rows have notification for reminder_id : " + reminder_id);
                             connection.query(`DELETE FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows){
@@ -457,7 +454,7 @@ router.post('/task', (req,res) => {
                         if(time_notification) {
                             console.log("Time Notification : " + time_notification);
                         }else {
-                            time_notification = "09:00";
+                            console.log("No Time Notification");
                         }
 
                         if(
@@ -493,7 +490,20 @@ router.post('/task', (req,res) => {
                                                             msg: 'updatereminder/task :  there are some error with insert notification placename'
                                                         });
                                                     }else {
-                                                        console.log("Complete Placename");
+                                                        console.log("Complete Placename for notification 1");
+                                                    }
+                                                });
+                                            }
+                                            if(time_notification) {
+                                                notification_id = rows.insertId;
+                                                connection.query(`UPDATE notification SET time = '` + time_notification + `' WHERE _id = '` + notification_id + `'`, function(err,rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'updatereminder/task :  there are some error with insert notification placename'
+                                                        });
+                                                    }else {
+                                                        console.log("Complete Time for notification 1");
                                                     }
                                                 });
                                             }
@@ -538,7 +548,20 @@ router.post('/task', (req,res) => {
                                                             msg: 'updatereminder/task :  there are some error with insert notification placename'
                                                         });
                                                     }else {
-                                                        console.log("Complete Placename");
+                                                        console.log("Complete Placename for notification 2");
+                                                    }
+                                                });
+                                            }
+                                            if(time_notification) {
+                                                notification_id = rows.insertId;
+                                                connection.query(`UPDATE notification SET time = '` + time_notification + `' WHERE _id = '` + notification_id + `'`, function(err,rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'updatereminder/task :  there are some error with insert notification placename'
+                                                        });
+                                                    }else {
+                                                        console.log("Complete Time for notification 2");
                                                     }
                                                 });
                                             }
@@ -583,7 +606,20 @@ router.post('/task', (req,res) => {
                                                             msg: 'updatereminder/task :  there are some error with insert notification placename'
                                                         });
                                                     }else {
-                                                        console.log("Complete Placename");
+                                                        console.log("Complete Placename gor notification 3");
+                                                    }
+                                                });
+                                            }
+                                            if(time_notification) {
+                                                notification_id = rows.insertId;
+                                                connection.query(`UPDATE notification SET time = '` + time_notification + `' WHERE _id = '` + notification_id + `'`, function(err,rows) {
+                                                    if(err) {
+                                                        res.send({
+                                                            status: 400,
+                                                            msg: 'updatereminder/task :  there are some error with insert notification placename'
+                                                        });
+                                                    }else {
+                                                        console.log("Complete Time for notification 3");
                                                     }
                                                 });
                                             }

@@ -595,7 +595,7 @@ router.post('/reminder', (req,res) => {
                                 if(notification_datetime_1){
                                     var num = parseInt(notification_datetime_1.num_notification_1);
                                     
-                                    if (num == 0) {
+                                    if (num == 0 || isNaN(num)) {
                                         console.log("notification_datetime_1 : num = 0");
                                     }else {
                                         console.log("notification_datetime_1 : " + num);
@@ -606,30 +606,29 @@ router.post('/reminder', (req,res) => {
                                         }else {
                                             var date_notification_table = notification_date_1.toLocaleDateString();
 
-                                            if(req.body.time) {
-                                                var time_notification = req.body.time;
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 1'
+                                            connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `" , "` + reminder_reminder.placename + `")`, function(err, notification1_rows) {
+                                                if(err) {
+                                                    res.send({
+                                                        status: 400,
+                                                        msg: 'addreminder/reminder : there are some error with insert notification 1'
+                                                    });
+                                                }else {
+                                                    console.log("notification_datetime_1 : success");
+                                                    if(req.body.time) {
+                                                        var notification1_id = notification1_rows.insertId;
+                                                        connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification1_id + `'`, function(err,rows) {
+                                                            if(err) {
+                                                                res.send({
+                                                                    status: 400,
+                                                                    msg: 'addreminder/reminder : there are some error with update time notification 1'
+                                                                });
+                                                            }else {
+                                                                console.log("notification_datetime_1 : success insert time");
+                                                            }
                                                         });
-                                                    }else {
-                                                        console.log("notification_datetime_1 : success");
                                                     }
-                                                });
-                                            }else {
-                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_1.before_after_1 + `" , "` + num + `" , "` + notification_datetime_1.type_num_1 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 1'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_1 : success");
-                                                    }
-                                                });
-                                            }
+                                                }
+                                            });
                                         }
                                     }
                                 }
@@ -637,7 +636,7 @@ router.post('/reminder', (req,res) => {
                                 if(notification_datetime_2){
                                     var num = parseInt(notification_datetime_2.num_notification_2);
 
-                                    if (num == 0) {
+                                    if (num == 0 || isNaN(num)) {
                                         console.log("notification_datetime_2 : num = 0");
                                     }else {
                                         console.log("notification_datetime_2 : " + num);
@@ -647,31 +646,31 @@ router.post('/reminder', (req,res) => {
                                             console.log("notification_datetime_2 : not success");
                                         }else {
                                             var date_notification_table = notification_date_2.toLocaleDateString();
+                                            
+                                            connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, notification2_rows) {
+                                                if(err) {
+                                                    res.send({
+                                                        status: 400,
+                                                        msg: 'addreminder/reminder : there are some error with insert notification 2'
+                                                    });
+                                                }else {
+                                                    console.log("notification_datetime_2 : success");
 
-                                            if(req.body.time) {
-                                                var time_notification = req.body.time;
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id + `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 2'
+                                                    if(req.body.time) {
+                                                        var notification2_id = notification2_rows.insertId;
+                                                        connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification2_id + `'`, function(err,rows) {
+                                                            if(err) {
+                                                                res.send({
+                                                                    status: 400,
+                                                                    msg: 'addreminder/reminder : there are some error with update time notification 2'
+                                                                });
+                                                            }else {
+                                                                console.log("notification_datetime_2 : success insert time");
+                                                            }
                                                         });
-                                                    }else {
-                                                        console.log("notification_datetime_2 : success");
                                                     }
-                                                });
-                                            }else {
-                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id +  `" , "` + date_notification_table + `" , "` + notification_datetime_2.before_after_2 + `" , "` + num + `" , "` + notification_datetime_2.type_num_2 + `" , "` + reminder_reminder.placename + `")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 2'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_2 : success");
-                                                    }
-                                                });
-                                            }
+                                                }
+                                            });
                                         }
                                     }
                                 }
@@ -679,7 +678,7 @@ router.post('/reminder', (req,res) => {
                                 if(notification_datetime_3){
                                     var num = parseInt(notification_datetime_3.num_notification_3);
 
-                                    if (num == 0) {
+                                    if (num == 0 || isNaN(num)) {
                                         console.log("notification_datetime_3 : num = 0");
                                     }else {
                                         console.log("notification_datetime_3 : " + num);
@@ -689,31 +688,30 @@ router.post('/reminder', (req,res) => {
                                             console.log("notification_datetime_3 : not success");
                                         }else {
                                             var date_notification_table = notification_date_3.toLocaleDateString();
-
-                                            if(req.body.time) {
-                                                var time_notification = req.body.time;
-                                                connection.query(`INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("` + reminder_id + `", "` + time_notification + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 3'
+   
+                                            connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + notification_datetime_3.type_num_3 + `" , "` + reminder_reminder.placename +`")`, function(err, notification3_rows) {
+                                                if(err) {
+                                                    res.send({
+                                                        status: 400,
+                                                        msg: 'addreminder/reminder : there are some error with insert notification 3'
+                                                    });
+                                                }else {
+                                                    console.log("notification_datetime_3 : success");
+                                                    if(req.body.time) {
+                                                        var notification3_id = notification3_rows.insertId;
+                                                        connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification3_id + `'`, function(err,rows) {
+                                                            if(err) {
+                                                                res.send({
+                                                                    status: 400,
+                                                                    msg: 'addreminder/reminder : there are some error with update time notification 3'
+                                                                });
+                                                            }else {
+                                                                console.log("notification_datetime_3 : success insert time");
+                                                            }
                                                         });
-                                                    }else {
-                                                        console.log("notification_datetime_3 : success");
                                                     }
-                                                });
-                                            }else {
-                                                connection.query(`INSERT INTO notification (reminder_id, date, before_after, number, type, placename) VALUES ("` + reminder_id + `" , "` + date_notification_table + `" , "` + notification_datetime_3.before_after_3 + `" , "` + num + `" , "` + notification_datetime_3.type_num_3 + `" , "` + reminder_reminder.placename +`")`, function(err, rows) {
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/reminder : there are some error with insert notification 3'
-                                                        });
-                                                    }else {
-                                                        console.log("notification_datetime_3 : success");
-                                                    }
-                                                });
-                                            }
+                                                }
+                                            });
                                         }
                                     }
                                 }

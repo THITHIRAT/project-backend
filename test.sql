@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Apr 09, 2018 at 05:45 PM
+-- Generation Time: Apr 16, 2018 at 06:28 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.1.5
 
@@ -64,13 +64,15 @@ CREATE TABLE `catalog` (
 --
 
 INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, `avg`, `mode`, `real_period_type_date`) VALUES
-(7, 'fresh food', 'meat', 7, 'days', 15, '15', 'days'),
-(13, 'fresh food', 'apple', 2, 'days', 2, NULL, 'days'),
-(15, 'food', 'snack', 1, 'years', NULL, NULL, NULL),
-(17, 'Fresh Food', 'Pork', 7, 'days', 2, '2', 'days'),
-(18, 'fresh food', 'orange', 7, 'days', 58, '58', 'days'),
-(19, 'fresh food', '', 10, 'days', 12, '9,15', 'days'),
-(20, 'fresh food', 'fruit', 7, 'days', NULL, NULL, NULL);
+(7, 'fresh food', 'meat', 15, 'days', 0, 'null', 'days'),
+(13, 'fresh food', 'apple', 2, 'days', 0, 'null', 'days'),
+(15, 'food', 'snack', 1, 'years', 0, 'null', 'days'),
+(17, 'Fresh Food', 'Pork', 7, 'days', 0, 'null', 'days'),
+(18, 'fresh food', 'orange', 7, 'days', 0, 'null', 'days'),
+(19, 'fresh food', '', 9, 'days', 8.5, '9', 'days'),
+(20, 'fresh food', 'fruit', 7, 'days', 7, '7', 'days'),
+(21, 'Health & Beauty', 'lip ', 1, 'days', 17, '17', 'days'),
+(22, 'Pantry Food', 'spicy sauce', 1, 'days', 16, '16', 'days');
 
 -- --------------------------------------------------------
 
@@ -81,29 +83,27 @@ INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, 
 CREATE TABLE `notification` (
   `_id` int(255) NOT NULL,
   `reminder_id` int(255) NOT NULL,
-  `time` time NOT NULL,
+  `time` time DEFAULT NULL,
   `date` varchar(20) NOT NULL,
   `before_after` varchar(10) DEFAULT NULL,
   `number` int(11) DEFAULT NULL,
-  `type` varchar(15) DEFAULT NULL
+  `type` varchar(15) DEFAULT NULL,
+  `placename` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `notification`
 --
 
-INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`, `before_after`, `number`, `type`) VALUES
-(251, 372, '18:30:00', '2561-04-13', NULL, NULL, NULL),
-(270, 375, '03:42:00', '2561-04-19', 'Before', 20, 'Hrs'),
-(290, 374, '11:00:00', '2561-04-17', 'Before', 10, 'Hrs'),
-(299, 376, '06:30:00', '2561-04-17', 'Before', 5, 'Mins'),
-(300, 376, '06:35:00', '2561-04-07', 'Before', 10, 'Days'),
-(301, 377, '01:39:00', '2561-04-17', 'Before', 1, 'Mins'),
-(305, 389, '23:51:00', '2561-04-15', 'Before', 9, 'Mins'),
-(306, 390, '07:27:00', '2561-04-25', 'Before', 3, 'Mins'),
-(319, 387, '23:57:00', '2561-04-27', 'Before', 3, 'Mins'),
-(328, 386, '00:00:00', '2561-04-14', 'Before', 5, 'Days'),
-(329, 386, '00:00:00', '2561-04-17', 'Before', 2, 'Days');
+INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`, `before_after`, `number`, `type`, `placename`) VALUES
+(440, 445, '18:30:00', '2561-04-26', 'Before', 3, 'Hrs', NULL),
+(448, 446, '21:31:00', '2561-04-21', 'Before', 4, 'Days', NULL),
+(451, 454, NULL, '2561-04-20', 'Before', 3, 'Days', ''),
+(452, 454, NULL, '2561-04-22', 'Before', 1, 'Days', ''),
+(453, 455, NULL, '2561-04-21', 'Before', 4, 'Days', ''),
+(454, 455, NULL, '2561-04-23', 'Before', 2, 'Days', ''),
+(458, 457, NULL, '2561-04-21', 'Before', 4, 'Days', ''),
+(459, 457, NULL, '2561-04-23', 'Before', 2, 'Days', '');
 
 -- --------------------------------------------------------
 
@@ -159,7 +159,8 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (48, 'KASIKORNBANK', 100.5296888, 13.743412200000003),
 (49, 'Paragon Cineplex', 100.53481230000001, 13.746090599999997),
 (50, 'MaxValu', 100.5837402, 13.7231104),
-(51, 'TOPS Supermarket', 100.56697249999999, 13.8437735);
+(51, 'TOPS Supermarket', 100.56697249999999, 13.8437735),
+(52, 'EVEANDBOY Siam Square One', 100.53391189999999, 13.744878000000002);
 
 -- --------------------------------------------------------
 
@@ -174,6 +175,7 @@ CREATE TABLE `reminder` (
   `notification` varchar(10) NOT NULL,
   `allday` int(1) DEFAULT NULL,
   `start_date` varchar(20) NOT NULL,
+  `purchase_date` varchar(20) DEFAULT NULL,
   `end_date` varchar(20) NOT NULL,
   `start_time` varchar(20) DEFAULT NULL,
   `end_time` varchar(20) DEFAULT NULL,
@@ -191,14 +193,20 @@ CREATE TABLE `reminder` (
 -- Dumping data for table `reminder`
 --
 
-INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `subtaskname`, `complete`, `timestamp_complete`, `total`) VALUES
-(375, 27, 'Reminder', 'undefined', 1, '2561-04-17', '2561-04-19', '23:06:00', '23:42:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'hello', 'arrive', 1, '2561-04-09 20:37:22', 0),
-(377, 27, 'Event', 'undefined', 0, '2561-04-11', '2561-04-17', '12:30:00', '01:40:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'testtest', 'undefined', 0, NULL, NULL),
-(386, 27, 'Reminder', 'undefined', 1, '2561-04-09', '2561-04-19', '10:25:00', '00:00:00', 'null', 0, 0, 'fresh food', '', 0, NULL, 0),
-(387, 27, 'Reminder', 'undefined', 1, '2561-04-11', '2561-04-28', '00:00:00', '00:00:00', 'null', 0, 0, 'hello', '', 0, NULL, 17),
-(389, 27, 'Reminder', 'undefined', 1, '2561-04-09', '2561-04-16', '00:00:00', '00:00:00', 'null', 0, 0, 'fresh food', 'meat', 1, NULL, 15),
-(390, 27, 'Reminder', 'undefined', 0, '2561-04-11', '2561-04-25', '04:30:00', '07:30:00', 'null', 0, 0, 'fresh food', 'chicken', 1, NULL, 9),
-(391, 27, 'Location', 'Arrive', NULL, '', '', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'kmitl', NULL, 0, NULL, NULL);
+INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `purchase_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `subtaskname`, `complete`, `timestamp_complete`, `total`) VALUES
+(445, 27, 'Reminder', '', NULL, '2561-04-10', '2561-04-16', '2561-04-27', NULL, NULL, '', 0, 0, 'health & beauty', 'lip ', 1, '2561-04-16 03:42:36', 17),
+(446, 27, 'Reminder', '', NULL, '2561-04-09', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'pantry food', 'spicy sauce', 1, '2561-04-16 03:46:29', 16),
+(448, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'learn', NULL, 1, '2561-04-16 03:44:42', NULL),
+(449, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping ', NULL, 1, '2561-04-16 03:45:16', NULL),
+(450, 27, 'Location', 'Depart', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'travel', NULL, 1, '2561-04-16 03:45:39', NULL),
+(451, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'work', NULL, 1, '2561-04-16 03:45:54', NULL),
+(452, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'meeting', NULL, 1, '2561-04-16 03:46:12', NULL),
+(453, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 1, '2561-04-16 03:47:24', 9),
+(454, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-23', NULL, NULL, '', 0, 0, 'fresh food', 'fruit', 1, '2561-04-16 03:47:56', 7),
+(455, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 1, '2561-04-16 18:13:00', 9),
+(457, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 1, '2561-04-16 21:53:31', 9),
+(461, 27, 'Event', '', 1, '2561-04-17', NULL, '2561-04-18', NULL, NULL, 'null', 0, 0, 'root ', NULL, 0, NULL, NULL),
+(462, 27, 'Location', 'Depart', NULL, '', NULL, '', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'sleep', NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -223,7 +231,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', 'test1234', 'test@root.com', NULL),
 (25, 'test', 'test1234', 'test@root.com', NULL),
 (26, 'test', 'test1234', 'test@test.com', NULL),
-(27, 'test', 'test1234', 'test1234@test.com', 'mm7ueABr4MKSfuRDA'),
+(27, 'test', 'test1234', 'test1234@test.com', 'vPBttTfSaKhXLtAhN'),
 (28, 'hello', 'test1234', 'hello1234@mail.com', NULL),
 (29, 'hello', 'test1234', 'hello@hello.com', NULL),
 (30, 'hello', 'test1234', 'hello1234@hello.com', NULL),
@@ -315,22 +323,22 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `catalog`
 --
 ALTER TABLE `catalog`
-  MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=330;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=465;
 --
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=392;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=463;
 --
 -- AUTO_INCREMENT for table `user`
 --

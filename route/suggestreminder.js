@@ -37,7 +37,7 @@ function count_notification_1(start, num){
 
     var count_num = num - Math.round(num * 0.5);
     if(count_num == 0) {
-        return "Before " + count_num + " Days";
+        return 0;
     }else if (count_num <= 29) {
         return "Before " + count_num + " Days";
     }else if(count_num > 29 && count_num <= 365) {
@@ -53,7 +53,7 @@ function count_notification_2(start, num){
 
     var count_num = num - Math.round(num * 0.8);
     if(count_num == 0) {
-        return  "Before " + count_num + " Days";
+        return  0;
     }else if (count_num <= 29) {
         return "Before " + count_num + " Days";
     }else if(count_num > 29 && count_num <= 365) {
@@ -118,11 +118,33 @@ router.post('/tasknamenotification', (req,res) => {
                         notification_2: notification_2
                     }
 
-                    if(notification.notification_1 == "zero" && notification.notification_2 == "zero") {
+                    var notification_1 = {
+                        notification_1: notification_1
+                    }
+
+                    var notification_2 = {
+                        notification_2: notification_2
+                    }
+
+                    if(notification.notification_1 == 0 && notification.notification_2 == 0) {
                         res.send({
                             status: 200,
                             output: output,
                             msg: 'suggestreminder/tasknamenotification : no before_after complete'
+                        });
+                    }else if(notification.notification_1 == 0 && notification.notification_2 != 0) {
+                        res.send({
+                            status: 200,
+                            output: output,
+                            notification: notification_2,
+                            msg: 'suggestreminder/tasknamenotification : complete'
+                        });
+                    }else if(notification.notification_2 == 0 && notification.notification_1 != 0) {
+                        res.send({
+                            status: 200,
+                            output: output,
+                            notification: notification_1,
+                            msg: 'suggestreminder/tasknamenotification : complete'
                         });
                     }else {
                         res.send({
@@ -208,16 +230,39 @@ router.post('/subtasknamenotification', (req,res) => {
                         startdate: startdate,
                         enddate: enddate,
                     }
+
                     var notification = {
                         notification_1: notification_1,
                         notification_2: notification_2
                     }
 
-                    if(notification.notification_1 == "" && notification.notification_2 == "") {
+                    var notification_1 = {
+                        notification_1: notification_1
+                    }
+
+                    var notification_2 = {
+                        notification_2: notification_2
+                    }
+
+                    if(notification.notification_1 == 0 && notification.notification_2 == 0) {
                         res.send({
                             status: 200,
                             output: output,
                             msg: 'suggestreminder/subtasknamenotification : no before_after complete'
+                        });
+                    }else if(notification.notification_1 == 0 && notification.notification_2 != 0) {
+                        res.send({
+                            status: 200,
+                            output: output,
+                            notification: notification_2,
+                            msg: 'suggestreminder/subtasknamenotification : complete'
+                        });
+                    }else if(notification.notification_2 == 0 && notification.notification_1 != 0) {
+                        res.send({
+                            status: 200,
+                            output: output,
+                            notification: notification_1,
+                            msg: 'suggestreminder/subtasknamenotification : complete'
                         });
                     }else {
                         res.send({
