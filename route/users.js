@@ -205,17 +205,33 @@ router.post('/resetpassword', (req,res) => {
                 });
             }else {
                 if(rows.length > 0) {
-                    connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, users_resetpassword.token, users_resetpassword.password], function(err, rows) {
+                    connection.query(`SELECT * FROM user WHERE token = ? AND password = ?` [users_resetpassword.token, users_resetpassword.password], function(err,rows_select) {
                         if(err) {
                             res.send({
                                 status: 400,
-                                msg: 'users/resetpassword : there are some error with query update'
+                                msg: 'users/resetpassword : there are some error with query select same token and password'
                             });
                         }else {
-                            res.send({
-                                status: 200,
-                                msg: 'users/resetpassword : update new password'
-                            });
+                            if(rows_select.length > 0) {
+                                connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, users_resetpassword.token, users_resetpassword.password], function(err, rows) {
+                                    if(err) {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'users/resetpassword : there are some error with query update'
+                                        });
+                                    }else {
+                                        res.send({
+                                            status: 200,
+                                            msg: 'users/resetpassword : update new password'
+                                        });
+                                    }
+                                });
+                            }else {
+                                res.send({
+                                    status: 400,
+                                    msg: "users/resetpassword : password incorrect"
+                                });
+                            }
                         }
                     });
                 }else {
