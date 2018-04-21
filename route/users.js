@@ -19,6 +19,31 @@ router.use(bodyParser.urlencoded({
     extended : false
 }));
 
+router.post('/detail', (req,res) => {
+    var token = req.body.token;
+    if(token) {
+        connection.query(`SELECT * FROM user WHERE token = ?`, [token], function(err,rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'users/detail : there are some error with query select user'
+                });
+            }else {
+                res.send({
+                    status: 200,
+                    data: rows,
+                    msg: 'users/detail : complete'
+                })
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: 'users/detail : permission denied'
+        });
+    }
+});
+
 router.post('/register', (req,res) => {
     // console.log(req.body);
     var now = new Date();
@@ -257,6 +282,48 @@ router.post('/changeusername', (req,res) => {
                             res.send({
                                 status: 200,
                                 msg: 'users/changeusername : update new username'
+                            });
+                        }
+                    });
+                }else {
+                    res.send({
+                        status: 400,
+                        msg: "users/changeusername : don't have token"
+                    });
+                }
+            }
+        });
+    }else {
+        res.send({
+            status: 403,
+            msg: "users/changeusername : permission denied"
+        });
+    }
+});
+
+router.post('/changeemail', (req,res) => {
+    var newemail = req.body.email;
+    var token = req.body.token;
+
+    if(token){
+        connection.query('SELECT * FROM user WHERE token = ?', token, function(err, rows) {
+            if(err) {
+                res.send({
+                    status: 400,
+                    msg: 'users/changeusername : there are some error with query select'
+                });
+            }else {
+                if(rows.length > 0) {
+                    connection.query('UPDATE user SET email = ? WHERE token = ?', [newemail, token], function(err, rows) {
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'users/changeusername : there are some error with query update'
+                            });
+                        }else {
+                            res.send({
+                                status: 200,
+                                msg: 'users/changeusername : update new email'
                             });
                         }
                     });

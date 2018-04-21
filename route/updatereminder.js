@@ -454,7 +454,8 @@ router.post('/task', (req,res) => {
                         if(time_notification) {
                             console.log("Time Notification : " + time_notification);
                         }else {
-                            console.log("No Time Notification");
+                            time_notification = "12:30";
+                            console.log("No Time Notification and Set default : " + time_notification);
                         }
 
                         if(

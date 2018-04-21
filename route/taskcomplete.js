@@ -77,7 +77,7 @@ router.post('/event', (req,res) => {
                 if(rows.length > 0) {
                     var id = rows[0]._id;
                     var complete = '1';
-                    connection.query('SELECT _id, user_id, start_date, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id, complete, "Event"], function(err, rows) {
+                    connection.query('SELECT _id, user_id, start_date, end_date, notification, placename, latitude, longtitude, taskname, complete FROM reminder WHERE user_id = ? AND complete = ? AND type= ?', [id, complete, "Event"], function(err, rows) {
                         if(err) {
                             res.send({
                                 status: 400,

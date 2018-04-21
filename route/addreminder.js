@@ -579,6 +579,14 @@ router.post('/reminder', (req,res) => {
                                 }
                             }
                         }
+
+                        var time_notification = req.body.time;
+                        if(time_notification) {
+                            console.log("Time Notification : " + time_notification);
+                        }else {
+                            time_notification = "12:30";
+                            console.log("No Time Notification and Set default : " + time_notification);
+                        }
                         
                         var purchase = new Date();
                         var purchase_table = purchase.toLocaleDateString();
@@ -614,7 +622,7 @@ router.post('/reminder', (req,res) => {
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_1 : success");
-                                                    if(req.body.time) {
+                                                    if(time_notification) {
                                                         var notification1_id = notification1_rows.insertId;
                                                         connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification1_id + `'`, function(err,rows) {
                                                             if(err) {
@@ -656,7 +664,7 @@ router.post('/reminder', (req,res) => {
                                                 }else {
                                                     console.log("notification_datetime_2 : success");
 
-                                                    if(req.body.time) {
+                                                    if(time_notification) {
                                                         var notification2_id = notification2_rows.insertId;
                                                         connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification2_id + `'`, function(err,rows) {
                                                             if(err) {
@@ -697,7 +705,7 @@ router.post('/reminder', (req,res) => {
                                                     });
                                                 }else {
                                                     console.log("notification_datetime_3 : success");
-                                                    if(req.body.time) {
+                                                    if(time_notification) {
                                                         var notification3_id = notification3_rows.insertId;
                                                         connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification3_id + `'`, function(err,rows) {
                                                             if(err) {
