@@ -274,114 +274,122 @@ router.post('/task', (req,res) => {
                 var endtime = end.toLocaleTimeString();
                 console.log("Input End Date : " + input.enddate + "/" + input.endmonth + "/" + input.endyear + " \nInput End Time : " + input.endhour + ":" + input.endmin +  "\n" + enddate + " & " + endtime);
                 
-                connection.query(`SELECT * FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows_selectnotification){
-                    if(err) {
-                        res.send({
-                            status: 400,
-                            msg: 'updatereminder/task : there are some error with select notification'
-                        });
-                    }else {
-                        console.log("Length : " + rows_selectnotification.length);
-                        console.log("typeof all day event : " + typeof(input.allday) + " - value : " + input.allday);
-                        if(rows_selectnotification.length > 0) {
-                            console.log("delete all rows have notification for reminder_id : " + reminder_id);
-                            connection.query(`DELETE FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows){
+
+                if(start.getTime() <= end.getTime()) {
+                    connection.query(`SELECT * FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows_selectnotification){
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'updatereminder/task : there are some error with select notification'
+                            });
+                        }else {
+                            console.log("Length : " + rows_selectnotification.length);
+                            console.log("typeof all day event : " + typeof(input.allday) + " - value : " + input.allday);
+                            if(rows_selectnotification.length > 0) {
+                                console.log("delete all rows have notification for reminder_id : " + reminder_id);
+                                connection.query(`DELETE FROM notification WHERE reminder_id = ?`, [reminder_id], function(err,rows){
+                                    if(err) {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'updatereminder/task : there are some error with delete notification'
+                                        });
+                                    }else {
+                                        console.log("Delete Notification complete");
+                                    }
+                                });
+                            }else {
+                                console.log("dont have notification for reminder_id : " + reminder_id);
+                            }
+    
+                            if(input.allday == "0") {
+                                if(
+                                    req.body.before_after_1
+                                    && req.body.num_notification_1
+                                    && req.body.type_num_1
+                                ){
+                                    var num = parseInt(req.body.num_notification_1);
+    
+                                    var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
+    
+                                    var time_notification_table = notification_date.toLocaleTimeString();
+                                    var date_notification_table = notification_date.toLocaleDateString();
+    
+                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
+                                        if(err) {
+                                            res.send({
+                                                status: 400,
+                                                msg: 'updatereminder/task : there are some error with insert notification'
+                                            });
+                                        }else {
+                                            console.log("insert notification allday = 0");
+                                        }
+                                    });
+                                }
+                                
+                            }else if(input.allday == "1"){
+                                if(
+                                    req.body.allday_date
+                                    && req.body.allday_month
+                                    && req.body.allday_year
+                                    && req.body.allday_hrs
+                                    && req.body.allday_mins
+                                ){
+                                    var int_year = req.body.allday_year;
+                                    var int_month = parseInt(req.body.allday_month) - 1;
+                                    var date_time_notification_table = new Date(int_year, int_month, req.body.allday_date, req.body.allday_hrs, req.body.allday_mins, 0, 0);
+                                    date_notification_table = date_time_notification_table.toLocaleDateString();
+                                    time_notification_table = date_time_notification_table.toLocaleTimeString();
+                                    connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
+                                        if(err) {
+                                            res.send({
+                                                status: 400,
+                                                msg: 'updatereminder/task : there are some error with insert notification'
+                                            });
+                                        }else {
+                                            console.log("insert notification allday = 1");
+                                        }
+                                    });
+                                }
+                            }else {
+                                res.send({
+                                    status: 400,
+                                    msg: 'updatereminder/task : dont have value of allday'
+                                });
+                            }
+                        }
+                    });
+    
+                    //update reminder table
+                    connection.query(`UPDATE reminder SET allday = '` + input.allday + `', start_date = '` + startdate + `', start_time = '` + starttime + `', end_date = '` + enddate + `', end_time = '` + endtime + `', placename = '` + input.placename + `', taskname = '` + input.taskname + `', subtaskname = '` + input.subtaskname + `' WHERE _id = '` + reminder_id + `'`, function(err,rows){
+                        if(err) {
+                            res.send({
+                                status: 400,
+                                msg: 'updatereminder/task : there are some error with query update reminder event'
+                            });
+                        }else {
+                            connection.query(`UPDATE reminder SET latitude = '` + latitude + `', longtitude = '` + longtitude + `' WHERE _id = '` + reminder_id + `'`, function(err,rows) {
                                 if(err) {
                                     res.send({
                                         status: 400,
-                                        msg: 'updatereminder/task : there are some error with delete notification'
+                                        msg: 'updatereminder/task : there are some error with query update reminder lat & lng'
                                     });
                                 }else {
-                                    console.log("Delete Notification complete");
+                                    res.send({
+                                        status: 200,
+                                        data: input,
+                                        place: "lat : " + latitude + " / lng : " + longtitude,
+                                        msg: 'updatereminder/task : complete'
+                                    });
                                 }
-                            });
-                        }else {
-                            console.log("dont have notification for reminder_id : " + reminder_id);
+                            })
                         }
-
-                        if(input.allday == "0") {
-                            if(
-                                req.body.before_after_1
-                                && req.body.num_notification_1
-                                && req.body.type_num_1
-                            ){
-                                var num = parseInt(req.body.num_notification_1);
-
-                                var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
-
-                                var time_notification_table = notification_date.toLocaleTimeString();
-                                var date_notification_table = notification_date.toLocaleDateString();
-
-                                connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
-                                    if(err) {
-                                        res.send({
-                                            status: 400,
-                                            msg: 'updatereminder/task : there are some error with insert notification'
-                                        });
-                                    }else {
-                                        console.log("insert notification allday = 0");
-                                    }
-                                });
-                            }
-                            
-                        }else if(input.allday == "1"){
-                            if(
-                                req.body.allday_date
-                                && req.body.allday_month
-                                && req.body.allday_year
-                                && req.body.allday_hrs
-                                && req.body.allday_mins
-                            ){
-                                var int_year = req.body.allday_year;
-                                var int_month = parseInt(req.body.allday_month) - 1;
-                                var date_time_notification_table = new Date(int_year, int_month, req.body.allday_date, req.body.allday_hrs, req.body.allday_mins, 0, 0);
-                                date_notification_table = date_time_notification_table.toLocaleDateString();
-                                time_notification_table = date_time_notification_table.toLocaleTimeString();
-                                connection.query('INSERT INTO notification (reminder_id, time, date) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '")', function(err, rows) {
-                                    if(err) {
-                                        res.send({
-                                            status: 400,
-                                            msg: 'updatereminder/task : there are some error with insert notification'
-                                        });
-                                    }else {
-                                        console.log("insert notification allday = 1");
-                                    }
-                                });
-                            }
-                        }else {
-                            res.send({
-                                status: 400,
-                                msg: 'updatereminder/task : dont have value of allday'
-                            });
-                        }
-                    }
-                });
-
-                //update reminder table
-                connection.query(`UPDATE reminder SET allday = '` + input.allday + `', start_date = '` + startdate + `', start_time = '` + starttime + `', end_date = '` + enddate + `', end_time = '` + endtime + `', placename = '` + input.placename + `', taskname = '` + input.taskname + `', subtaskname = '` + input.subtaskname + `' WHERE _id = '` + reminder_id + `'`, function(err,rows){
-                    if(err) {
-                        res.send({
-                            status: 400,
-                            msg: 'updatereminder/task : there are some error with query update reminder event'
-                        });
-                    }else {
-                        connection.query(`UPDATE reminder SET latitude = '` + latitude + `', longtitude = '` + longtitude + `' WHERE _id = '` + reminder_id + `'`, function(err,rows) {
-                            if(err) {
-                                res.send({
-                                    status: 400,
-                                    msg: 'updatereminder/task : there are some error with query update reminder lat & lng'
-                                });
-                            }else {
-                                res.send({
-                                    status: 200,
-                                    data: input,
-                                    place: "lat : " + latitude + " / lng : " + longtitude,
-                                    msg: 'updatereminder/task : complete'
-                                });
-                            }
-                        })
-                    }
-                });
+                    });
+                }else {
+                    res.send({
+                        status: 400,
+                        msg: 'updatereminder/task : incorrect start and end date time'
+                    });
+                }
             }else {
                 res.send({
                     status: 403,

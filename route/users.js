@@ -210,7 +210,7 @@ router.post('/logout', (req,res) => {
     }
 });
 
-router.post('/resetpassword', (req,res) => {
+router.post('/resetpassword', (req,res) => {    
     var users_resetpassword = {
         password: req.body.password,
         token: req.body.token
@@ -230,39 +230,31 @@ router.post('/resetpassword', (req,res) => {
                 });
             }else {
                 if(rows.length > 0) {
-                    connection.query(`SELECT * FROM user WHERE token = ? AND password = ?` [users_resetpassword.token, users_resetpassword.password], function(err,rows_select) {
-                        if(err) {
-                            res.send({
-                                status: 400,
-                                msg: 'users/resetpassword : there are some error with query select same token and password'
-                            });
-                        }else {
-                            if(rows_select.length > 0) {
-                                connection.query('UPDATE user SET password = ? WHERE token = ? AND password = ?', [newpassword, users_resetpassword.token, users_resetpassword.password], function(err, rows) {
-                                    if(err) {
-                                        res.send({
-                                            status: 400,
-                                            msg: 'users/resetpassword : there are some error with query update'
-                                        });
-                                    }else {
-                                        res.send({
-                                            status: 200,
-                                            msg: 'users/resetpassword : update new password'
-                                        });
-                                    }
+                    console.log(users_resetpassword.password);
+                    if(rows[0].password == users_resetpassword.password) {
+                        connection.query(`UPDATE user SET password = ?`, [newpassword], function(err,rows){
+                            if(err) {
+                                res.send({
+                                    status: 400,
+                                    msg: 'users/resetpassword : there are some error with query update'
                                 });
                             }else {
                                 res.send({
-                                    status: 400,
-                                    msg: "users/resetpassword : password incorrect"
+                                    status: 200,
+                                    msg: 'users/resetpassword : update new password'
                                 });
                             }
-                        }
-                    });
+                        });
+                    }else {
+                        res.send({
+                            status: 400,
+                            msg: "users/resetpassword : input password don't match current password"
+                        });
+                    }
                 }else {
                     res.send({
                         status: 400,
-                        msg: "users/resetpassword : don't have token"
+                        msg: "users/resetpassword : don't have token match current password"
                     });
                 }
             }
