@@ -351,10 +351,17 @@ router.post('/event', (req,res) => {
                                         var traffic_date;
                                         var count_distance_traffic = 0;
                                         var count_time_traffic = 0;
+
                                         var list_taskname = null;
                                         var list_location = null;
                                         var list_start = null;
                                         var list_end = null;
+                                    
+                                        var list_taskname_output = null;
+                                        var list_location_output = null;
+                                        var list_start_output = null;
+                                        var list_end_output = null;
+
                                         var requestLocation = [true]
                                         for (var i=0; i<rows_select_reminder.length; i++) {
                                             requestLocation.push(new Promise(function(resolve,reject) {
@@ -393,19 +400,31 @@ router.post('/event', (req,res) => {
                                                 }
 
                                                 list_taskname = rows_select_reminder[i].taskname;
-                                                list_location = rows_select_reminder[i].location;
+                                                list_location = rows_select_reminder[i].placename;
                                                 list_start = int_start_date + "/" + (int_start_month+1) + "/" + (int_start_year+543) + " " + int_start_hour + ":" + int_start_min;
                                                 list_end = int_end_date + "/" + (int_end_month+1) + "/" + (int_end_year+543) + " " + int_end_hour + ":" + int_end_min;
+                                                console.log(list_taskname + " " + list_location + " " + list_start + " " + list_end + "\n");
 
                                                 if(start.getTime() >= start_list_msec && start.getTime() <= end_list_msec) {
-                                                    resolve(true)
+                                                    list_taskname_output = list_taskname;
+                                                    list_location_output = list_location;
+                                                    list_start_output = list_start;
+                                                    list_end_output = list_end;
+                                                    resolve(false)
+                                                    //resolve(true)
                                                     // check = false;
                                                     console.log("\nfalse : start_list");
                                                 }else if(end.getTime() >= start_list_msec && end.getTime() <= end_list_msec) {
-                                                    resolve(true)
+                                                    list_taskname_output = list_taskname;
+                                                    list_location_output = list_location;
+                                                    list_start_output = list_start;
+                                                    list_end_output = list_end;
+                                                    resolve(false)
+                                                    //resolve(true)
                                                     // check = false;
                                                     console.log("\nfalse : end_list");
                                                 }else {
+                                                    console.log("Place check : " + longtitude_list + " " + latitude_list + " " + longtitude + " " + latitude)
                                                     if (longtitude_list != null && latitude_list != null && longtitude != null && latitude != null) {
                                                         var api = "AIzaSyBqen24A8jnMVNYz5FTA-Fl4Hry0ocktLQ"
                                                         var callapi = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
@@ -421,7 +440,12 @@ router.post('/event', (req,res) => {
                                                             console.log(" - Destination : " + data.destination_addresses);
                                                             console.log(" - Origin : " + data.origin_addresses);
                                                             if(data.status == "INVALID_REQUEST") {
-                                                                resolve(true)
+                                                                list_taskname_output = list_taskname;
+                                                                list_location_output = list_location;
+                                                                list_start_output = list_start;
+                                                                list_end_output = list_end;
+                                                                reject(false);
+                                                                //resolve(true)
                                                                 // check = false;
                                                             }else {
                                                                 console.log("Distance : " + data.rows[0].elements[0].distance.text);
@@ -436,12 +460,17 @@ router.post('/event', (req,res) => {
                                                                     if(traffic_date.getTime() < end.getTime()) {
                                                                         count_distance_traffic = data.rows[0].elements[0].distance.text;
                                                                         count_time_traffic = data.rows[0].elements[0].duration_in_traffic.text;
-                                                                        resolve(true)
+
+                                                                        list_taskname_output = list_taskname;
+                                                                        list_location_output = list_location;
+                                                                        list_start_output = list_start;
+                                                                        list_end_output = list_end;
+                                                                        reject(false);
+                                                                        ///resolve(true)
                                                                         // check = false;
                                                                     }
-                                                                    reject(false)
-                                                                }
-                                                                else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
+                                                                    resolve(false)
+                                                                }else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
                                                                     console.log("After list");
                                                                     var traffic = end_list_msec + count_traffic_milliseconds(data.rows[0].elements[0].duration_in_traffic.text);
                                                                     var traffic_date = new Date(traffic);
@@ -450,93 +479,181 @@ router.post('/event', (req,res) => {
                                                                     if(traffic_date.getTime() > start.getTime()) {
                                                                         count_distance_traffic = data.rows[0].elements[0].distance.text;
                                                                         count_time_traffic = data.rows[0].elements[0].duration_in_traffic.text;
-                                                                        resolve(true)
+
+                                                                        list_taskname_output = list_taskname;
+                                                                        list_location_output = list_location;
+                                                                        list_start_output = list_start;
+                                                                        list_end_output = list_end;
+                                                                        reject(false);
+                                                                        ///resolve(true)
                                                                         // check = false;
                                                                     }
-                                                                    reject(false)
+                                                                    resolve(false)
                                                                 }
                                                             }
                                                         });
+                                                    }else {
+                                                        if(start.getTime() < start_list_msec && end.getTime() < start_list_msec) {
+                                                            console.log("min");
+                                                            list_taskname_output = list_taskname;
+                                                            list_location_output = list_location;
+                                                            list_start_output = list_start;
+                                                            list_end_output = list_end;
+                                                            reject(true);
+                                                        } else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
+                                                            console.log("max");
+                                                            list_taskname_output = list_taskname;
+                                                            list_location_output = list_location;
+                                                            list_start_output = list_start;
+                                                            list_end_output = list_end;
+                                                            reject(true);
+                                                        } else {
+                                                            console.log("reject");
+                                                            resolve(false)
+                                                        }
+                                                        // reject(true)
+                                                        /// reject(false)
                                                     }
                                                 }
                                             }))
                                         }
                                         Promise.all(requestLocation)
                                             .then(function(check) {
-                                                console.log(check);
-                                                if(check.includes(false)) {
-                                                    res.send({
-                                                        status: 400,
-                                                        data: {
-                                                            distance: count_distance_traffic,
-                                                            time: count_time_traffic,
-                                                            location: list_location,
-                                                            start: list_start,
-                                                            end: list_end,
-                                                            taskname: list_taskname
-                                                        },
-                                                        check: check,
-                                                        msg: 'addreminder/event : allday = 0 : cannot add this event'
-                                                    });
-                                                }else {
-                                                    res.send({
-                                                        status: 200,
-                                                        check: check,
-                                                        msg: 'addreminder/event : allday = 0 : can add this event'
-                                                    });
-                                                }
-                                            })
-                                            .catch(function(error) {
-                                                console.log(check); 
-                                                connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
-                                                    if(err) {
-                                                        res.send({
-                                                            status: 400,
-                                                            msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
-                                                        });
-                                                    }else {
-                                                        console.log("Reminder_id : " + rows.insertId);
-                                                        reminder_id = rows.insertId;
-                                                        if(
-                                                            notification_datetime.before_after
-                                                            && notification_datetime.num_notification
-                                                            && notification_datetime.type_num
-                                                        ){
-                                                            var num = parseInt(notification_datetime.num_notification);
-                                                
-                                                            var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
-                                                
-                                                            if(notification_date != null) {
-                                                                var time_notification_table = notification_date.toLocaleTimeString();
-                                                                var date_notification_table = notification_date.toLocaleDateString();
+                                                console.log("then : " + check);
+                                                if(!check.includes(false)) {
+                                                    connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
+                                                        if(err) {
+                                                            res.send({
+                                                                status: 400,
+                                                                msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
+                                                            });
+                                                        }else {
+                                                            console.log("Reminder_id : " + rows.insertId);
+                                                            reminder_id = rows.insertId;
+                                                            if(
+                                                                notification_datetime.before_after
+                                                                && notification_datetime.num_notification
+                                                                && notification_datetime.type_num
+                                                            ){
+                                                                var num = parseInt(notification_datetime.num_notification);
                                                     
-                                                                connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num +'")', function(err, rows) {
-                                                                    if(err) {
-                                                                        res.send({
-                                                                            status: 400,
-                                                                            msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
-                                                                        });
-                                                                    }else {
-                                                                        res.send({
-                                                                            status: 200,
-                                                                            msg: 'addreminder/event : allday = 0 : insert notification complete'
-                                                                        });
-                                                                    }
-                                                                });
+                                                                var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
+                                                    
+                                                                if(notification_date != null) {
+                                                                    var time_notification_table = notification_date.toLocaleTimeString();
+                                                                    var date_notification_table = notification_date.toLocaleDateString();
+                                                        
+                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num +'")', function(err, rows) {
+                                                                        if(err) {
+                                                                            res.send({
+                                                                                status: 400,
+                                                                                msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
+                                                                            });
+                                                                        }else {
+                                                                            res.send({
+                                                                                status: 200,
+                                                                                msg: 'addreminder/event : allday = 0 : insert notification complete'
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }else {
+                                                                    res.send({
+                                                                        status: 200,
+                                                                        msg: 'addreminder/event : allday = 0 : complete'
+                                                                    });
+                                                                }
                                                             }else {
                                                                 res.send({
                                                                     status: 200,
                                                                     msg: 'addreminder/event : allday = 0 : complete'
                                                                 });
                                                             }
-                                                        }else {
-                                                            res.send({
-                                                                status: 200,
-                                                                msg: 'addreminder/event : allday = 0 : complete'
-                                                            });
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }else {
+                                                    res.send({
+                                                        status: 400,
+                                                        data: {
+                                                            distance: count_distance_traffic,
+                                                            time: count_time_traffic,
+                                                            list_location: list_location_output,
+                                                            list_start: list_start_output,
+                                                            list_end: list_end_output,
+                                                            list_taskname: list_taskname_output
+                                                        },
+                                                        check: check,
+                                                        msg: 'addreminder/event : allday = 0 : cannot add this event'
+                                                    });
+                                                }
+                                            })
+                                            .catch(function(error) {
+                                                console.log("catch : " + check); 
+                                                if(check == true) {
+                                                    res.send({
+                                                        status: 400,
+                                                        data: {
+                                                            distance: count_distance_traffic,
+                                                            time: count_time_traffic,
+                                                            list_location: list_location_output,
+                                                            list_start: list_start_output,
+                                                            list_end: list_end_output,
+                                                            list_taskname: list_taskname_output
+                                                        },
+                                                        check: check,
+                                                        msg: 'addreminder/event : allday = 0 : cannot add this event'
+                                                    });
+                                                }else {
+                                                    connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
+                                                        if(err) {
+                                                            res.send({
+                                                                status: 400,
+                                                                msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
+                                                            });
+                                                        }else {
+                                                            console.log("Reminder_id : " + rows.insertId);
+                                                            reminder_id = rows.insertId;
+                                                            if(
+                                                                notification_datetime.before_after
+                                                                && notification_datetime.num_notification
+                                                                && notification_datetime.type_num
+                                                            ){
+                                                                var num = parseInt(notification_datetime.num_notification);
+                                                    
+                                                                var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
+                                                    
+                                                                if(notification_date != null) {
+                                                                    var time_notification_table = notification_date.toLocaleTimeString();
+                                                                    var date_notification_table = notification_date.toLocaleDateString();
+                                                        
+                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num +'")', function(err, rows) {
+                                                                        if(err) {
+                                                                            res.send({
+                                                                                status: 400,
+                                                                                msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
+                                                                            });
+                                                                        }else {
+                                                                            res.send({
+                                                                                status: 200,
+                                                                                msg: 'addreminder/event : allday = 0 : insert notification complete'
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }else {
+                                                                    res.send({
+                                                                        status: 200,
+                                                                        msg: 'addreminder/event : allday = 0 : complete'
+                                                                    });
+                                                                }
+                                                            }else {
+                                                                res.send({
+                                                                    status: 200,
+                                                                    msg: 'addreminder/event : allday = 0 : complete'
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                
                                             });
                                     }
                                 });

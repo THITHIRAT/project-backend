@@ -85,11 +85,6 @@ router.post('/editarrive', (req,res) => {
         && middle_time_sec
         && min_time_sec
     ){
-        console.log("max_distance : " + max_distance);
-        console.log("min_distance : " + min_distance);
-        console.log("min_time_sec : " + min_time_sec);
-        console.log("middle_time_sec : " + middle_time_sec);
-        console.log("max_time_sec : " + max_time_sec);
         connection.query(`UPDATE location_notification SET max_distance ='` + max_distance + `' , min_distance ='` + min_distance + `' , max_time_sec = '` + max_time_sec + `' , middle_time_sec = '` + middle_time_sec + `' , min_time_sec = '` + min_time_sec + `' WHERE type = "arrive"`, function(err,rows) {
             if(err) {
                 res.send({
@@ -126,11 +121,6 @@ router.post('/editpass', (req,res) => {
         && middle_time_sec
         && min_time_sec
     ){
-        console.log("max_distance : " + max_distance);
-        console.log("min_distance : " + min_distance);
-        console.log("min_time_sec : " + min_time_sec);
-        console.log("middle_time_sec : " + middle_time_sec);
-        console.log("max_time_sec : " + max_time_sec);
         connection.query(`UPDATE location_notification SET max_distance ='` + max_distance + `' , min_distance ='` + min_distance + `' , max_time_sec = '` + max_time_sec + `' , middle_time_sec = '` + middle_time_sec + `' , min_time_sec = '` + min_time_sec + `' WHERE type = "pass"`, function(err,rows) {
             if(err) {
                 res.send({
