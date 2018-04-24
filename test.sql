@@ -1,22 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.0
+-- version 4.7.7
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Apr 23, 2018 at 07:32 PM
--- Server version: 5.6.34-log
--- PHP Version: 7.1.5
+-- Generation Time: Apr 24, 2018 at 09:57 AM
+-- Server version: 5.6.38
+-- PHP Version: 7.2.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `test`
@@ -83,18 +75,21 @@ INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, 
 CREATE TABLE `location_notification` (
   `_id` int(255) NOT NULL,
   `type` varchar(10) NOT NULL,
-  `distance` int(128) NOT NULL,
-  `time` int(128) NOT NULL
+  `max_distance` int(128) NOT NULL,
+  `max_time_sec` int(128) NOT NULL,
+  `middle_time_sec` int(128) NOT NULL,
+  `min_distance` int(128) NOT NULL,
+  `min_time_sec` int(128) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `location_notification`
 --
 
-INSERT INTO `location_notification` (`_id`, `type`, `distance`, `time`) VALUES
-(1, 'arrive', 15, 5),
-(2, 'pass', 15, 5),
-(3, 'depart', 15, 5);
+INSERT INTO `location_notification` (`_id`, `type`, `max_distance`, `max_time_sec`, `middle_time_sec`, `min_distance`, `min_time_sec`) VALUES
+(1, 'arrive', 10, 400, 100, 3, 50),
+(2, 'pass', 10, 400, 0, 0, 0),
+(3, 'depart', 10, 400, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -152,7 +147,9 @@ INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`, `before_after`
 (491, 500, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
 (492, 501, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
 (493, 502, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
-(494, 503, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL);
+(494, 503, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
+(495, 521, '09:48:00', '2014-12-12', 'After', 7, 'Days', NULL),
+(496, 522, '09:48:00', '2014-12-12', 'After', 7, 'Days', NULL);
 
 -- --------------------------------------------------------
 
@@ -279,7 +276,9 @@ INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `sta
 (515, 27, 'Event', '', 0, '2561-04-25', NULL, '2561-04-25', '06:30:00', '07:30:00', 'Siam Center', 13.746252399999998, 100.53286349999999, 'I will ', NULL, 1, '2561-04-24 02:14:12', NULL),
 (516, 27, 'Event', '', 0, '2561-04-25', NULL, '2561-04-25', '06:30:00', '07:30:00', 'Siam Center', 13.746252399999998, 100.53286349999999, 'I will ', NULL, 1, '2561-04-24 02:14:12', NULL),
 (519, 27, 'Event', '', 0, '2561-04-22', NULL, '2561-04-22', '06:08:00', '07:08:00', 'Central Plaza Ladprao', 13.816401400000002, 100.56081809999999, 'root ', NULL, 0, NULL, NULL),
-(520, 27, 'Event', '', 0, '2561-04-26', NULL, '2561-04-26', '06:35:00', '08:35:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'hello', NULL, 0, NULL, NULL);
+(520, 27, 'Event', '', 0, '2561-04-26', NULL, '2561-04-26', '06:35:00', '08:35:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'hello', NULL, 0, NULL, NULL),
+(521, 27, 'Event', '', 0, '2014-12-3', NULL, '2014-12-5', '12:44:00', '09:48:00', 'Bangkok', 13.7563309, 100.5017651, 'test 3', NULL, 0, NULL, NULL),
+(522, 27, 'Event', '', 0, '2014-12-3', NULL, '2014-12-5', '12:44:00', '09:48:00', 'Bangkok', 13.7563309, 100.5017651, 'test 3', NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -399,37 +398,39 @@ ALTER TABLE `user`
 --
 ALTER TABLE `admin`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- AUTO_INCREMENT for table `catalog`
 --
 ALTER TABLE `catalog`
   MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
 --
 -- AUTO_INCREMENT for table `location_notification`
 --
 ALTER TABLE `location_notification`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=495;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=497;
+
 --
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=521;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=523;
+
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
