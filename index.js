@@ -48,6 +48,9 @@ app.use('/complete', complete);
 var incomplete = require('./route/incomplete.js');
 app.use('/incomplete', incomplete);
 
+var location_notification = require('./route/location_notification.js');
+app.use('/location_notification', location_notification);
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });
