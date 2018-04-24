@@ -355,7 +355,7 @@ router.post('/event', (req,res) => {
                                         var list_location = null;
                                         var list_start = null;
                                         var list_end = null;
-                                        var requestLocation = []
+                                        var requestLocation = [true]
                                         for (var i=0; i<rows_select_reminder.length; i++) {
                                             requestLocation.push(new Promise(function(resolve,reject) {
                                                 var start_date = rows_select_reminder[i].start_date;
@@ -464,7 +464,7 @@ router.post('/event', (req,res) => {
                                         Promise.all(requestLocation)
                                             .then(function(check) {
                                                 console.log(check);
-                                                if(!check.includes(false)) {
+                                                if(check.includes(false)) {
                                                     res.send({
                                                         status: 400,
                                                         data: {
@@ -475,7 +475,14 @@ router.post('/event', (req,res) => {
                                                             end: list_end,
                                                             taskname: list_taskname
                                                         },
+                                                        check: check,
                                                         msg: 'addreminder/event : allday = 0 : cannot add this event'
+                                                    });
+                                                }else {
+                                                    res.send({
+                                                        status: 200,
+                                                        check: check,
+                                                        msg: 'addreminder/event : allday = 0 : can add this event'
                                                     });
                                                 }
                                             })
