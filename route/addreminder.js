@@ -148,7 +148,7 @@ function count_milliseconds(start, end, before_after, num, type){
 
 function count_traffic_milliseconds(distance) {
     var split_distance = distance.split(" ");
-    console.log(split_distance);
+    console.log("count distance function" + split_distance);
 
     var total_msec_traffic = 0;
     if(split_distance[1] == "hours") {
@@ -313,6 +313,7 @@ router.post('/event', (req,res) => {
                     var id = rows[0]._id;
 
                     if(reminder_event.allday == "0") {
+                        // console.log(reminder_event);
                         if(
                             reminder_event.starthour 
                             && reminder_event.startmin
@@ -330,13 +331,14 @@ router.post('/event', (req,res) => {
                             var start = new Date(int_startyear, int_startmonth, reminder_event.startdate, reminder_event.starthour, reminder_event.startmin);
                             var startdate = start.toLocaleDateString();
                             var starttime = start.toLocaleTimeString();
+                            console.log("Input Start : " + startdate + " " + starttime);
 
                             var int_endmonth = parseInt(reminder_event.endmonth) - 1;
                             var int_endyear = reminder_event.endyear;
-                            console.log("int_endyear" + int_endyear);
                             var end = new Date(int_endyear, int_endmonth, reminder_event.enddate, reminder_event.endhour, reminder_event.endmin);
                             var enddate = end.toLocaleDateString();
                             var endtime = end.toLocaleTimeString();
+                            console.log("Input End : " + enddate + " " + endtime);
                             
                             if(start.getTime() <= end.getTime()) {
                                 var check = true;
@@ -363,6 +365,7 @@ router.post('/event', (req,res) => {
                                         var list_end_output = null;
 
                                         var requestLocation = [true]
+                                        console.log(rows_select_reminder.length);
                                         for (var i=0; i<rows_select_reminder.length; i++) {
                                             requestLocation.push(new Promise(function(resolve,reject) {
                                                 var start_date = rows_select_reminder[i].start_date;
@@ -392,7 +395,7 @@ router.post('/event', (req,res) => {
 
                                                 var end_list = new Date(int_end_year, int_end_month, int_end_date, int_end_hour, int_end_min);
                                                 var end_list_msec = end_list.getTime();
-
+                                                console.log("endlist : " + end_list.toDateString());
                                                 var longtitude_list, latitude_list = null
                                                 if(rows_select_reminder[i].longtitude && rows_select_reminder[i].latitude) {
                                                     longtitude_list = rows_select_reminder[i].longtitude;
@@ -403,7 +406,7 @@ router.post('/event', (req,res) => {
                                                 list_location = rows_select_reminder[i].placename;
                                                 list_start = int_start_date + "/" + (int_start_month+1) + "/" + (int_start_year+543) + " " + int_start_hour + ":" + int_start_min;
                                                 list_end = int_end_date + "/" + (int_end_month+1) + "/" + (int_end_year+543) + " " + int_end_hour + ":" + int_end_min;
-                                                console.log(list_taskname + " " + list_location + " " + list_start + " " + list_end + "\n");
+                                                console.log("\n" + list_taskname + " " + list_location + " " + list_start + " " + list_end);
 
                                                 if(start.getTime() >= start_list_msec && start.getTime() <= end_list_msec) {
                                                     list_taskname_output = list_taskname;
@@ -413,7 +416,7 @@ router.post('/event', (req,res) => {
                                                     resolve(false)
                                                     //resolve(true)
                                                     // check = false;
-                                                    console.log("\nfalse : start_list");
+                                                    console.log("false : start_list");
                                                 }else if(end.getTime() >= start_list_msec && end.getTime() <= end_list_msec) {
                                                     list_taskname_output = list_taskname;
                                                     list_location_output = list_location;
@@ -422,9 +425,9 @@ router.post('/event', (req,res) => {
                                                     resolve(false)
                                                     //resolve(true)
                                                     // check = false;
-                                                    console.log("\nfalse : end_list");
+                                                    console.log("false : end_list");
                                                 }else {
-                                                    console.log("Place check : " + longtitude_list + " " + latitude_list + " " + longtitude + " " + latitude)
+                                                    console.log("Place check : " + longtitude_list + " " + latitude_list + " " + longtitude + " " + latitude + " - Check time : " + end_list_msec);
                                                     if (longtitude_list != null && latitude_list != null && longtitude != null && latitude != null) {
                                                         var api = "AIzaSyBqen24A8jnMVNYz5FTA-Fl4Hry0ocktLQ"
                                                         var callapi = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
@@ -436,9 +439,8 @@ router.post('/event', (req,res) => {
 
                                                         request(url, function(error, response, body) {
                                                             console.log(typeof(body));
+                                                            console.log(body);
                                                             var data = JSON.parse(body);
-                                                            console.log(" - Destination : " + data.destination_addresses);
-                                                            console.log(" - Origin : " + data.origin_addresses);
                                                             if(data.status == "INVALID_REQUEST") {
                                                                 list_taskname_output = list_taskname;
                                                                 list_location_output = list_location;
@@ -448,6 +450,9 @@ router.post('/event', (req,res) => {
                                                                 //resolve(true)
                                                                 // check = false;
                                                             }else {
+                                                                console.log(" - Destination : " + data.destination_addresses);
+                                                                console.log(" - Origin : " + data.origin_addresses);
+
                                                                 console.log("Distance : " + data.rows[0].elements[0].distance.text);
                                                                 console.log("Time : " + data.rows[0].elements[0].duration_in_traffic.text);
                                                                 
@@ -455,7 +460,7 @@ router.post('/event', (req,res) => {
                                                                     console.log("Before list");
                                                                     var traffic = start_list_msec - count_traffic_milliseconds(data.rows[0].elements[0].duration_in_traffic.text);
                                                                     var traffic_date = new Date(traffic);
-                                                                    console.log(traffic_date.toLocaleDateString() + " " + traffic_date.toLocaleTimeString() + " " + traffic_date.getTime());
+                                                                    console.log("traffic date : " + traffic_date.toLocaleDateString() + " traffic time : " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
                                                                     console.log(end.toLocaleDateString() + " " + end.toLocaleTimeString() + " " + end.getTime());
                                                                     if(traffic_date.getTime() < end.getTime()) {
                                                                         count_distance_traffic = data.rows[0].elements[0].distance.text;
@@ -474,7 +479,7 @@ router.post('/event', (req,res) => {
                                                                     console.log("After list");
                                                                     var traffic = end_list_msec + count_traffic_milliseconds(data.rows[0].elements[0].duration_in_traffic.text);
                                                                     var traffic_date = new Date(traffic);
-                                                                    console.log(traffic_date.toLocaleDateString() + " " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
+                                                                    console.log("traffic date : " + traffic_date.toLocaleDateString() + " traffic time : " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
                                                                     console.log(start.toLocaleDateString() + " " + start.toLocaleTimeString() + " " + start.getTime());
                                                                     if(traffic_date.getTime() > start.getTime()) {
                                                                         count_distance_traffic = data.rows[0].elements[0].distance.text;
@@ -495,18 +500,26 @@ router.post('/event', (req,res) => {
                                                     }else {
                                                         if(start.getTime() < start_list_msec && end.getTime() < start_list_msec) {
                                                             console.log("min");
-                                                            list_taskname_output = list_taskname;
-                                                            list_location_output = list_location;
-                                                            list_start_output = list_start;
-                                                            list_end_output = list_end;
-                                                            reject(true);
+                                                            if(longtitude_list == null || latitude_list == null || longtitude == null || latitude != null) {
+                                                                resolve(true)
+                                                            }else {
+                                                                list_taskname_output = list_taskname;
+                                                                list_location_output = list_location;
+                                                                list_start_output = list_start;
+                                                                list_end_output = list_end;
+                                                                reject(true);
+                                                            }
                                                         } else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
                                                             console.log("max");
-                                                            list_taskname_output = list_taskname;
-                                                            list_location_output = list_location;
-                                                            list_start_output = list_start;
-                                                            list_end_output = list_end;
-                                                            reject(true);
+                                                            if(longtitude_list == null || latitude_list == null || longtitude == null || latitude != null) {
+                                                                resolve(true)
+                                                            }else {
+                                                                list_taskname_output = list_taskname;
+                                                                list_location_output = list_location;
+                                                                list_start_output = list_start;
+                                                                list_end_output = list_end;
+                                                                reject(true);
+                                                            }
                                                         } else {
                                                             console.log("reject");
                                                             resolve(false)
