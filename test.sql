@@ -1,14 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.7
+-- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Apr 24, 2018 at 09:57 AM
--- Server version: 5.6.38
--- PHP Version: 7.2.1
+-- Generation Time: Apr 25, 2018 at 05:45 PM
+-- Server version: 5.6.34-log
+-- PHP Version: 7.1.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `test`
@@ -57,14 +65,14 @@ CREATE TABLE `catalog` (
 
 INSERT INTO `catalog` (`_id`, `type`, `item`, `period_num`, `period_type_date`, `avg`, `mode`, `real_period_type_date`) VALUES
 (7, 'fresh food', 'meat', 15, 'days', 0, 'null', 'days'),
-(13, 'fresh food', 'apple', 2, 'days', 0, 'null', 'days'),
-(15, 'food', 'snack', 1, 'years', 0, 'null', 'days'),
-(17, 'Fresh Food', 'Pork', 7, 'days', 0, 'null', 'days'),
-(18, 'fresh food', 'orange', 7, 'days', 0, 'null', 'days'),
-(19, 'fresh food', '', 9, 'days', 0, 'null', 'days'),
+(13, 'fresh food', 'apple', 5, 'days', 0, 'null', 'days'),
+(15, 'food', 'snack', 365, 'days', 0, 'null', 'days'),
+(17, 'Fresh Food', 'Pork', 5, 'days', 0, 'null', 'days'),
+(18, 'fresh food', 'orange', 10, 'days', 0, 'null', 'days'),
+(19, 'fresh food', '', 7, 'days', 9, '9', 'days'),
 (20, 'fresh food', 'fruit', 7, 'days', 0, 'null', 'days'),
-(21, 'Health & Beauty', 'lip ', 1, 'days', 0, 'null', 'days'),
-(22, 'Pantry Food', 'spicy sauce', 1, 'days', 0, 'null', 'days');
+(21, 'Health & Beauty', 'lip ', 365, 'days', 0, 'null', 'days'),
+(22, 'Pantry Food', 'spicy sauce', 365, 'days', 0, 'null', 'days');
 
 -- --------------------------------------------------------
 
@@ -87,9 +95,9 @@ CREATE TABLE `location_notification` (
 --
 
 INSERT INTO `location_notification` (`_id`, `type`, `max_distance`, `max_time_sec`, `middle_time_sec`, `min_distance`, `min_time_sec`) VALUES
-(1, 'arrive', 10, 400, 100, 3, 50),
-(2, 'pass', 10, 400, 0, 0, 0),
-(3, 'depart', 10, 400, 0, 0, 0);
+(1, 'arrive', 10, 300, 100, 5, 50),
+(2, 'pass', 10, 300, 100, 5, 50),
+(3, 'depart', 2, 30, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -116,8 +124,6 @@ INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`, `before_after`
 (448, 446, '21:31:00', '2561-04-21', 'Before', 4, 'Days', NULL),
 (451, 454, NULL, '2561-04-20', 'Before', 3, 'Days', ''),
 (452, 454, NULL, '2561-04-22', 'Before', 1, 'Days', ''),
-(453, 455, NULL, '2561-04-21', 'Before', 4, 'Days', ''),
-(454, 455, NULL, '2561-04-23', 'Before', 2, 'Days', ''),
 (460, 470, '05:00:00', '2561-04-10', 'Before', 10, 'Hrs', NULL),
 (461, 471, '18:30:00', '2561-04-18', NULL, NULL, NULL, NULL),
 (462, 472, NULL, '2561-04-26', 'Before', 7, 'Days', 'Mega Bangna'),
@@ -149,7 +155,9 @@ INSERT INTO `notification` (`_id`, `reminder_id`, `time`, `date`, `before_after`
 (493, 502, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
 (494, 503, '12:45:00', '2557-12-13', 'After', 7, 'Days', NULL),
 (495, 521, '09:48:00', '2014-12-12', 'After', 7, 'Days', NULL),
-(496, 522, '09:48:00', '2014-12-12', 'After', 7, 'Days', NULL);
+(496, 522, '09:48:00', '2014-12-12', 'After', 7, 'Days', NULL),
+(497, 455, '12:30:00', '2561-04-21', 'Before', 4, 'Days', NULL),
+(498, 455, '12:30:00', '2561-04-23', 'Before', 2, 'Days', NULL);
 
 -- --------------------------------------------------------
 
@@ -210,7 +218,8 @@ INSERT INTO `place` (`_id`, `name`, `longtitude`, `latitude`) VALUES
 (53, 'Timber cafe thailand', 100.76597029999999, 13.7270538),
 (54, 'Dream World', 100.67508699999999, 13.987753999999999),
 (55, 'Central Plaza Ladprao', 100.56081809999999, 13.816401400000002),
-(56, 'Bangkok Noi', 100.4677576, 13.765922499999999);
+(56, 'Bangkok Noi', 100.4677576, 13.765922499999999),
+(57, 'Rayong', 101.1473517, 12.707433999999997);
 
 -- --------------------------------------------------------
 
@@ -244,14 +253,14 @@ CREATE TABLE `reminder` (
 --
 
 INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `start_date`, `purchase_date`, `end_date`, `start_time`, `end_time`, `placename`, `latitude`, `longtitude`, `taskname`, `subtaskname`, `complete`, `timestamp_complete`, `total`) VALUES
-(445, 27, 'Reminder', '', NULL, '2561-04-10', '2561-04-16', '2561-04-27', NULL, NULL, '', 0, 0, 'health & beauty', 'lip ', 0, '2561-04-16 03:42:36', 17),
+(445, 27, 'Reminder', '', NULL, '2561-04-10', '2561-04-16', '2561-04-28', NULL, NULL, '', 0, 0, 'health & beauty', 'lip ', 0, '2561-04-16 03:42:36', 17),
 (446, 27, 'Reminder', '', NULL, '2561-04-09', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'pantry food', 'spicy sauce', 0, '2561-04-16 03:46:29', 16),
 (448, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'learn', NULL, 1, '2561-04-18 01:07:08', NULL),
 (449, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping ', NULL, 1, '2561-04-19 01:35:16', NULL),
 (450, 27, 'Location', 'Depart', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'travel', NULL, 1, '2561-04-19 01:35:17', NULL),
 (451, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'work', NULL, 1, '2561-04-18 01:05:07', NULL),
 (452, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'meeting', NULL, 1, '2561-04-18 01:05:05', NULL),
-(453, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 0, '2561-04-16 03:47:24', 9),
+(453, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 1, '2561-04-24 19:36:39', 9),
 (454, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-23', NULL, NULL, '', 0, 0, 'fresh food', 'fruit', 0, '2561-04-16 03:47:56', 7),
 (455, 27, 'Reminder', '', NULL, '2561-04-16', '2561-04-16', '2561-04-25', NULL, NULL, '', 0, 0, 'fresh food', '', 0, '2561-04-18 01:03:20', 9),
 (462, 27, 'Location', 'Depart', NULL, '', NULL, '', NULL, NULL, 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'sleep', NULL, 1, '2561-04-18 01:07:10', NULL),
@@ -264,21 +273,17 @@ INSERT INTO `reminder` (`_id`, `user_id`, `type`, `notification`, `allday`, `sta
 (474, 65, 'Location', 'Pass', NULL, '', NULL, '', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'buy food', NULL, 1, '2561-04-18 02:08:26', NULL),
 (475, 65, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Pattaya City', 12.9235557, 100.8824551, 'find crab', NULL, 1, '2561-04-18 02:09:12', NULL),
 (476, 65, 'Location', 'Pass', NULL, '', NULL, '', NULL, NULL, 'Bangkok', 13.7563309, 100.5017651, 'travel', NULL, 1, '2561-04-18 03:36:01', NULL),
-(503, 27, 'Event', '', 0, '2557-12-05', NULL, '2557-12-06', '10:15:00', '12:45:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'test 3', NULL, 0, NULL, NULL),
+(503, 27, 'Event', '', 0, '2557-12-05', NULL, '2557-12-06', '10:15:00', '12:45:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'test 3', NULL, 1, '2561-04-24 19:36:51', NULL),
 (504, 27, 'Event', '', 0, '2561-04-18', NULL, '2561-04-19', '06:30:00', '18:30:00', 'KMITL Faculty of Engineering Office', 13.7269923, 100.7763884, 'root ', NULL, 1, '2561-04-24 01:56:06', NULL),
 (506, 27, 'Event', '', 0, '2561-04-15', NULL, '2561-04-15', '12:30:00', '14:00:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'test', NULL, 1, '2561-04-24 01:56:05', NULL),
 (507, 27, 'Event', '', 0, '2561-04-21', NULL, '2561-04-21', '11:44:00', '12:00:00', 'Chon Buri', 13.361143099999998, 100.98467169999999, 'hello', NULL, 1, '2561-04-24 01:56:05', NULL),
 (508, 27, 'Event', '', 0, '2561-04-23', NULL, '2561-04-23', '11:55:00', '12:00:00', 'Bangkok', 13.7563309, 100.5017651, 'root ', NULL, 1, '2561-04-24 02:10:05', NULL),
 (509, 27, 'Event', '', 0, '2561-04-22', NULL, '2561-04-22', '10:48:00', '12:00:00', 'Seacon Square', 13.6939777, 100.6481189, 'event', NULL, 1, '2561-04-24 02:10:04', NULL),
 (510, 27, 'Event', '', 0, '2561-04-30', NULL, '2561-04-30', '09:51:00', '10:44:00', 'Bangkok', 13.7563309, 100.5017651, 'the ', NULL, 1, '2561-04-24 02:10:03', NULL),
-(513, 27, 'Event', '', 0, '2561-04-22', NULL, '2561-04-22', '12:00:00', '12:30:00', 'Bangkok Noi', 13.765922499999999, 100.4677576, 'the', NULL, 1, '2561-04-24 02:14:13', NULL),
-(514, 27, 'Event', '', 0, '2561-04-22', NULL, '2561-04-22', '12:00:00', '12:30:00', 'Bangkok Noi', 13.765922499999999, 100.4677576, 'the', NULL, 1, '2561-04-24 02:14:12', NULL),
-(515, 27, 'Event', '', 0, '2561-04-25', NULL, '2561-04-25', '06:30:00', '07:30:00', 'Siam Center', 13.746252399999998, 100.53286349999999, 'I will ', NULL, 1, '2561-04-24 02:14:12', NULL),
-(516, 27, 'Event', '', 0, '2561-04-25', NULL, '2561-04-25', '06:30:00', '07:30:00', 'Siam Center', 13.746252399999998, 100.53286349999999, 'I will ', NULL, 1, '2561-04-24 02:14:12', NULL),
-(519, 27, 'Event', '', 0, '2561-04-22', NULL, '2561-04-22', '06:08:00', '07:08:00', 'Central Plaza Ladprao', 13.816401400000002, 100.56081809999999, 'root ', NULL, 0, NULL, NULL),
-(520, 27, 'Event', '', 0, '2561-04-26', NULL, '2561-04-26', '06:35:00', '08:35:00', 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'hello', NULL, 0, NULL, NULL),
-(521, 27, 'Event', '', 0, '2014-12-3', NULL, '2014-12-5', '12:44:00', '09:48:00', 'Bangkok', 13.7563309, 100.5017651, 'test 3', NULL, 0, NULL, NULL),
-(522, 27, 'Event', '', 0, '2014-12-3', NULL, '2014-12-5', '12:44:00', '09:48:00', 'Bangkok', 13.7563309, 100.5017651, 'test 3', NULL, 0, NULL, NULL);
+(523, 27, 'Location', 'Arrive', NULL, '', NULL, '', NULL, NULL, 'Mega Bangna', 13.648608300000001, 100.67980709999999, 'shopping', NULL, 0, NULL, NULL),
+(524, 27, 'Location', 'Pass', NULL, '', NULL, '', NULL, NULL, 'Seacon Square', 13.6939777, 100.6481189, 'pay card', NULL, 0, NULL, NULL),
+(525, 27, 'Event', '', 0, '2561-04-24', NULL, '2561-04-24', '12:00:00', '12:30:00', 'Seacon Square', 13.6939777, 100.6481189, 'event1', NULL, 0, NULL, NULL),
+(529, 27, 'Event', '', 0, '2561-04-24', NULL, '2561-04-24', '10:30:00', '11:00:00', 'null', 0, 0, 'testtest', NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -303,7 +308,7 @@ INSERT INTO `user` (`_id`, `username`, `password`, `email`, `token`) VALUES
 (24, 'test', '1234', 'test@root.com', NULL),
 (25, 'test', '1234', 'test@root.com', NULL),
 (26, 'test', '1234', 'test@test.com', NULL),
-(27, 'test', '1234', 'test1234@test.com', 'hEYXLejHpL8L9DMKa'),
+(27, 'test', '1234', 'test1234@test.com', 'c4gYsXoenpaWDQPH3'),
 (28, 'hello', '1234', 'hello1234@mail.com', NULL),
 (29, 'hello', '1234', 'hello@hello.com', NULL),
 (30, 'hello', '1234', 'hello1234@hello.com', NULL),
@@ -398,39 +403,37 @@ ALTER TABLE `user`
 --
 ALTER TABLE `admin`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
 --
 -- AUTO_INCREMENT for table `catalog`
 --
 ALTER TABLE `catalog`
   MODIFY `_id` int(32) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
-
 --
 -- AUTO_INCREMENT for table `location_notification`
 --
 ALTER TABLE `location_notification`
   MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=497;
-
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=499;
 --
 -- AUTO_INCREMENT for table `place`
 --
 ALTER TABLE `place`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
-
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 --
 -- AUTO_INCREMENT for table `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=523;
-
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=530;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

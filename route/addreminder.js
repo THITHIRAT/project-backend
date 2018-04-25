@@ -148,18 +148,19 @@ function count_milliseconds(start, end, before_after, num, type){
 
 function count_traffic_milliseconds(distance) {
     var split_distance = distance.split(" ");
-    console.log("count distance function" + split_distance);
 
     var total_msec_traffic = 0;
-    if(split_distance[1] == "hours") {
+    if(split_distance[1] == "hours" || split_distance[1] == "hour") {
         total_msec_traffic = total_msec_traffic + (split_distance[0]*60*60*1000);
     }
-    if(split_distance[1] == "mins") {
-        total_msec_traffic = total_msec_traffic + (split_distance[0]*60*1000);
-    }
-    if(split_distance[3] == "mins") {
+    if(split_distance[3] == "mins" || split_distance[3] == "min") {
         total_msec_traffic = total_msec_traffic + (split_distance[2]*60*1000);
     }
+    if(split_distance[1] == "mins" || split_distance[1] == "min") {
+        total_msec_traffic = total_msec_traffic + (split_distance[0]*60*1000);
+    }
+
+    console.log("count distance function : " + split_distance + " / " + total_msec_traffic);
 
     return total_msec_traffic;
 }
@@ -365,7 +366,6 @@ router.post('/event', (req,res) => {
                                         var list_end_output = null;
 
                                         var requestLocation = [true]
-                                        console.log(rows_select_reminder.length);
                                         for (var i=0; i<rows_select_reminder.length; i++) {
                                             requestLocation.push(new Promise(function(resolve,reject) {
                                                 var start_date = rows_select_reminder[i].start_date;
@@ -438,8 +438,7 @@ router.post('/event', (req,res) => {
                                                         var url = callapi + origins + destinations + mode_arrive + API_KEY;
 
                                                         request(url, function(error, response, body) {
-                                                            console.log(typeof(body));
-                                                            console.log(body);
+                                                            // console.log(typeof(body));
                                                             var data = JSON.parse(body);
                                                             if(data.status == "INVALID_REQUEST") {
                                                                 list_taskname_output = list_taskname;
