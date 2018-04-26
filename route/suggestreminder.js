@@ -41,7 +41,7 @@ function count_notification_1(start, num){
     }else if (count_num <= 29) {
         return "Before " + count_num + " Days";
     }else if(count_num > 29 && count_num <= 365) {
-        var count_num_mth = Math.round(count_num/12);
+        var count_num_mth = Math.round(count_num/30);
         return "Before " + count_num_mth + " Mths";
     }else {
         return count_num;
@@ -57,7 +57,7 @@ function count_notification_2(start, num){
     }else if (count_num <= 29) {
         return "Before " + count_num + " Days";
     }else if(count_num > 29 && count_num <= 365) {
-        var count_num_mth = Math.round(count_num/12);
+        var count_num_mth = Math.round(count_num/30);
         return "Before " + count_num_mth + " Mths";
     }else {
         return count_num;

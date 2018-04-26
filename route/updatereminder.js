@@ -23,20 +23,18 @@ router.use(bodyParser.urlencoded({
 function count_reminder(msec_end, before_after, num, type){
     var temp = 0;
 
-    if(type == "Mins") {
-        temp = parseInt(num) * 60 * 1000;
-    }
-    else if(type == "Hrs") {
-        temp = parseInt(num) * 60 * 60 * 1000;
-    }
-    else if(type == "Days") {
+    var enddate = new Date(msec_end);
+    var enddate_month = enddate.getMonth() + 1;
+    var enddate_year = enddate.getFullYear();
+
+    if(type == "Days") {
         temp = parseInt(num) * 24 * 60 * 60 * 1000;
     }
     else if(type == "Mths") {
-        console.log("End Date Months : " + (end.getMonth() + 1));
+        console.log("End Date Months : " + enddate_month + enddate_year);
         var loop = parseInt(num);
         for(var i=0; i<loop; i++) {
-            var num_month = end.getMonth();
+            var num_month = enddate_month - 1;
             if(num_month == 0 || num_month == 2 || num_month == 4 || num_month == 6 || num_month == 7 || num_month == 9 || num_month == 11) {
                 temp = temp + 2678400000;
                 num_month++;
@@ -46,7 +44,7 @@ function count_reminder(msec_end, before_after, num, type){
                 num_month++;
             }
             else if(num_month == 1) {
-                if((end.getFullYear() + 1)%4 == 0) {
+                if((enddate_year + 1)%4 == 0) {
                     temp = temp + 2505600000;
                     num_month++;
                 }else {
@@ -57,7 +55,7 @@ function count_reminder(msec_end, before_after, num, type){
         }
     }
     else if(type == "Yrs") {
-        if((end.getFullYear() +1)%4 == 0) {
+        if((enddate_year +1)%4 == 0) {
             temp = temp + 31622400000;
         }else {
             temp = temp + 31536000000;

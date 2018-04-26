@@ -51,6 +51,10 @@ app.use('/incomplete', incomplete);
 var location_notification = require('./route/location_notification.js');
 app.use('/location_notification', location_notification);
 
+var checktime = require('./route/checktime.js');
+app.use('/checktime', checktime);
+
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });
