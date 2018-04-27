@@ -126,10 +126,10 @@ function count_milliseconds(start, end, before_after, num, type){
     var notification;
 
     if(before_after == "Before") {
-        notification = msec_end - temp;
+        notification = msec_start - temp;
     }
     else if(before_after == "After") {
-        notification = msec_end + temp;
+        notification = msec_start + temp;
     }
 
     if(notification) {

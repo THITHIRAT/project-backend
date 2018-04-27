@@ -127,10 +127,10 @@ function count_milliseconds(start, end, before_after, num, type){
     var notification;
 
     if(before_after == "Before") {
-        notification = msec_end - temp;
+        notification = msec_start - temp;
     }
     else if(before_after == "After") {
-        notification = msec_end + temp;
+        notification = msec_start + temp;
     }
 
     if(notification) {
@@ -553,7 +553,7 @@ router.post('/event', (req,res) => {
                                                                     var time_notification_table = notification_date.toLocaleTimeString();
                                                                     var date_notification_table = notification_date.toLocaleDateString();
                                                         
-                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num +'")', function(err, rows) {
+                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num + '" , "' + reminder_event.placename + '")', function(err, rows) {
                                                                         if(err) {
                                                                             res.send({
                                                                                 status: 400,

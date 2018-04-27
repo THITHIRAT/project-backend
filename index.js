@@ -54,6 +54,8 @@ app.use('/location_notification', location_notification);
 var checktime = require('./route/checktime.js');
 app.use('/checktime', checktime);
 
+var checklocation = require('./route/checklocation.js');
+app.use('/checklocation', checklocation);
 
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
