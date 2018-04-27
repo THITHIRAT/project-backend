@@ -919,6 +919,18 @@ router.post('/reminder', (req,res) => {
                             }else {
                                 console.log("Reminder_id : " + rows.insertId);
                                 reminder_id = rows.insertId;
+
+                                connection.query(`INSERT INTO notification (reminder_id, date, time, placename) VALUES ("` + reminder_id + `" , "` + enddate + `" , "` + time_notification + `" , "`+ reminder_reminder.placename +`")`, function(err, notification_rows) {
+                                    if(err) {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'addreminder/reminder : there are some error with insert notification default'
+                                        });
+                                    }else {
+                                        console.log("notification_datetime_deafault : success");
+                                    }
+                                });
+
                                 if(notification_datetime_1){
                                     var num = parseInt(notification_datetime_1.num_notification_1);
                                     
@@ -1032,7 +1044,7 @@ router.post('/reminder', (req,res) => {
                                                         console.log("notification_datetime_3 : success");
                                                         if(time_notification) {
                                                             var notification3_id = notification3_rows.insertId;
-                                                            connection.query(`UPDATE notification SET time = '` + req.body.time + `' WHERE _id = '` + notification3_id + `'`, function(err,rows) {
+                                                            connection.query(`UPDATE notification SET time = '` + time_notification + `' WHERE _id = '` + notification3_id + `'`, function(err,rows) {
                                                                 if(err) {
                                                                     res.send({
                                                                         status: 400,

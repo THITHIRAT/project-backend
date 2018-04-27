@@ -474,6 +474,17 @@ router.post('/task', (req,res) => {
                                 console.log("updatereminder/task : notification_datetime_1 for num = 0");
                             }else {
                                 var notification_date_1 = count_reminder(end.getTime(), notification_datetime_1.before_after_1, num, notification_datetime_1.type_num_1);
+
+                                connection.query(`INSERT INTO notification (reminder_id, date, time, placename) VALUES ("` + reminder_id + `" , "` + enddate + `" , "` + time_notification + `" , "`+ req.body.placename +`")`, function(err, notification_rows) {
+                                    if(err) {
+                                        res.send({
+                                            status: 400,
+                                            msg: 'addreminder/reminder : there are some error with insert notification default'
+                                        });
+                                    }else {
+                                        console.log("notification_datetime_deafault : success");
+                                    }
+                                });
                 
                                 if(notification_date_1 == null) {
                                     console.log("updatereminder/task : notification_datetime_1 not success");

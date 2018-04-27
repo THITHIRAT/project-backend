@@ -51,14 +51,22 @@ router.post('/task', (req,res) => {
                                 });
                             }else {
                                 var array_output = new Array();
+                                var index = 0;
                                 for (var i=0; i<loop; i++) {
-                                    var output = {
-                                        before_after: rows_notification[i].before_after,
-                                        number: rows_notification[i].number,
-                                        type: rows_notification[i].type,
-                                        time: rows_notification[i].time,
+                                    if(
+                                        rows_notification[i].before_after
+                                        && rows_notification[i].type
+                                        && rows_notification[i].time
+                                    ) {
+                                        var output = {
+                                            before_after: rows_notification[i].before_after,
+                                            number: rows_notification[i].number,
+                                            type: rows_notification[i].type,
+                                            time: rows_notification[i].time,
+                                        }
+                                        array_output[index] = output;
+                                        index++;
                                     }
-                                    array_output[i] = output;
                                 }
                                 console.log("detailreminder" + "\ntaskname : " + rows[0].taskname);
                                 res.send({
