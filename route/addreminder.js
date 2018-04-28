@@ -350,7 +350,6 @@ router.post('/event', (req,res) => {
                                             var index = [];
                                             var index_reject = [];
                                             var check = true;
-                                            
                                             for(var i=0; i<rows_select_reminder.length; i++) {
                                                 console.log("\n" + rows_select_reminder[i].taskname);
                                                 console.log("Start list : " + rows_select_reminder[i].start_date + " " + rows_select_reminder[i].start_time);
@@ -380,10 +379,10 @@ router.post('/event', (req,res) => {
                                                     var start_list = new Date(int_startyear, int_startmonth, int_startdate, int_starthour, int_startmin);
                                                     var end_list = new Date(int_endyear, int_endmonth, int_enddate, int_endhour, int_endmin);
 
-                                                    if(start_list.getTime() < start.getTime() && start.getTime() < end_list.getTime()) {
+                                                    if(start_list.getTime() <= start.getTime() && start.getTime() <= end_list.getTime()) {
                                                         check = false;
                                                         index_reject.push(i);
-                                                    }else if(start_list.getTime() < end.getTime() && end.getTime() < end_list.getTime()) {
+                                                    }else if(start_list.getTime() <= end.getTime() && end.getTime() <= end_list.getTime()) {
                                                         check = false;
                                                         index_reject.push(i);
                                                     }else {
@@ -415,6 +414,7 @@ router.post('/event', (req,res) => {
                                                 }
                                                 if(check_place == true) {
                                                     var index_request = [];
+                                                    var index_noti = [];
                                                     var requestLocation = []
                                                     var check_request = true;
                                                     for (var i=0; i<rows_select_reminder.length; i++) {
@@ -464,25 +464,27 @@ router.post('/event', (req,res) => {
                                                                     // console.log(start.getTime() + " - " + start_list.getTime());
                                                                     // console.log(end.getTime() + " - " + end_list.getTime());
 
-                                                                    if(start.getTime() < start_list.getTime() && end.getTime() < start_list.getTime()) {
+                                                                    if(start.getTime() <= start_list.getTime() && end.getTime() <= start_list.getTime()) {
                                                                         console.log("less");
                                                                         var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
                                                                         var traffic_time_sec = start_list.getTime() - msec;
                                                                         console.log("Traffice : " + traffic_time_sec + " - " + end.getTime());
                                                                         if(traffic_time_sec < end.getTime()) {
                                                                             console.log("reject");
+                                                                            index_noti.push(num);
                                                                             reject(false);
                                                                         }else {
                                                                             console.log("resolve");
                                                                             resolve(true);
                                                                         }
-                                                                    }else if(start.getTime() > end_list.getTime() && end.getTime() > end_list.getTime()) {
+                                                                    }else if(start.getTime() >= end_list.getTime() && end.getTime() >= end_list.getTime()) {
                                                                         console.log("more");
                                                                         var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
                                                                         var traffic_time_sec = end_list.getTime() + msec;
-                                                                        console.log("Traffice : " + traffic_time_sec + " - " + start.getTime());
+                                                                        console.log("Traffic : " + traffic_time_sec + " - " + start.getTime());
                                                                         if(traffic_time_sec > start.getTime()) {
                                                                             console.log("reject");
+                                                                            index_noti.push(num);
                                                                             reject(false);
                                                                         }else {
                                                                             console.log("resolve");
@@ -506,6 +508,29 @@ router.post('/event', (req,res) => {
                                                                         msg: 'addreminder/event : allday = 0 : there are some error with query insert reminder'
                                                                     });
                                                                 }else {
+                                                                    if(
+                                                                        req.body.before_after
+                                                                        && req.body.num_notification
+                                                                        && req.body.type_num
+                                                                    ){
+                                                                        var num = parseInt(req.body.num_notification_1);
+                                        
+                                                                        var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
+                                        
+                                                                        var time_notification_table = notification_date.toLocaleTimeString();
+                                                                        var date_notification_table = notification_date.toLocaleDateString();
+                                        
+                                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
+                                                                            if(err) {
+                                                                                res.send({
+                                                                                    status: 400,
+                                                                                    msg: 'addreminder/event : there are some error with insert notification'
+                                                                                });
+                                                                            }else {
+                                                                                console.log("insert notification allday = 0");
+                                                                            }
+                                                                        });
+                                                                    }
                                                                     res.send({
                                                                         status: 200,
                                                                         msg: 'addreminder/event : allday = 0 : can add event when then loop'
@@ -515,9 +540,18 @@ router.post('/event', (req,res) => {
                                                         })
                                                         .catch(function(error) {
                                                             console.log("catach : " + check);
+                                                            var reminder = rows_select_reminder.filter(function(element,index){
+                                                                if( index_noti.findIndex(function(e){ return e == index }) > -1 ){
+                                                                    return true;
+                                                                }
+                                                                else {
+                                                                    return false;
+                                                                }
+                                                            });
                                                             res.send({
-                                                                status: 200,
-                                                                msg: 'addreminder/event : allday = 0 : catach complete'
+                                                                status: 400,
+                                                                data: reminder,
+                                                                msg: 'addreminder/event : allday = 0 : warning traffic'
                                                             });
                                                         })
                                                 }
@@ -545,6 +579,29 @@ router.post('/event', (req,res) => {
                                                         msg: 'addreminder/event : allday = 0 : there are some error with query insert reminder'
                                                     });
                                                 }else {
+                                                    if(
+                                                        req.body.before_after
+                                                        && req.body.num_notification
+                                                        && req.body.type_num
+                                                    ){
+                                                        var num = parseInt(req.body.num_notification_1);
+                        
+                                                        var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
+                        
+                                                        var time_notification_table = notification_date.toLocaleTimeString();
+                                                        var date_notification_table = notification_date.toLocaleDateString();
+                        
+                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
+                                                            if(err) {
+                                                                res.send({
+                                                                    status: 400,
+                                                                    msg: 'addreminder/event : there are some error with insert notification'
+                                                                });
+                                                            }else {
+                                                                console.log("insert notification allday = 0");
+                                                            }
+                                                        });
+                                                    }
                                                     res.send({
                                                         status: 200,
                                                         msg: 'addreminder/event : allday = 0 : can add event when reminder_event.length = 0'
@@ -623,7 +680,7 @@ router.post('/event', (req,res) => {
                                             });
                                         }else {
                                             res.send({
-                                                status: 400,
+                                                status: 200,
                                                 msg: 'addreminder/event : allday = 1 : dont have allday > date, month, year, hrs, mins'
                                             });
                                         }
