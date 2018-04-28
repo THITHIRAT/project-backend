@@ -60,6 +60,9 @@ app.use('/checklocation', checklocation);
 var checklocation_forlocation = require('./route/checklocation_forlocation.js');
 app.use('/checklocation_forlocation', checklocation_forlocation);
 
+var addevent_task = require('./route/addevent_task.js');
+app.use('/addevent_task', addevent_task);
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });

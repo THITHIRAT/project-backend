@@ -158,7 +158,7 @@ function count_traffic_milliseconds(distance) {
         total_msec_traffic = total_msec_traffic + (split_distance[0]*60*1000);
     }
 
-    console.log("count distance function : " + split_distance + " / " + total_msec_traffic);
+    console.log("Count distance function : " + split_distance + " / " + total_msec_traffic);
 
     return total_msec_traffic;
 }
@@ -308,7 +308,6 @@ router.post('/event', (req,res) => {
                 });
             }else {
                 if(rows.length > 0) {
-                    console.log("user_id : " + rows[0]._id);
                     var id = rows[0]._id;
 
                     if(reminder_event.allday == "0") {
@@ -340,326 +339,219 @@ router.post('/event', (req,res) => {
                             console.log("Input End : " + enddate + " " + endtime);
                             
                             if(start.getTime() <= end.getTime()) {
-                                var check = true;
-                                connection.query(`SELECT * FROM reminder WHERE type = "Event" AND allday = 0 AND complete = 0 AND user_id =  ?`, id, function(err,rows_select_reminder){
+                                connection.query(`SELECT * FROM reminder WHERE allday = '0' AND type = 'Event' AND complete = '0' AND user_id IN (SELECT _id FROM user WHERE _id = ?)`, [id], function(err,rows_select_reminder){
                                     if(err) {
                                         res.send({
                                             status: 400,
                                             msg: 'addreminder/event : allday = 0 : there are some error with query select reminder'
                                         });
                                     }else {
-                                        var traffic;
-                                        var traffic_date;
-                                        var count_distance_traffic = 0;
-                                        var count_time_traffic = 0;
+                                        if(rows_select_reminder.length > 0) {
+                                            var index = [];
+                                            var index_reject = [];
+                                            var check = true;
+                                            
+                                            for(var i=0; i<rows_select_reminder.length; i++) {
+                                                console.log("\n" + rows_select_reminder[i].taskname);
+                                                console.log("Start list : " + rows_select_reminder[i].start_date + " " + rows_select_reminder[i].start_time);
+                                                console.log("End list : " + rows_select_reminder[i].end_date + " " + rows_select_reminder[i].end_time);
+                                                console.log("Placename : " + rows_select_reminder[i].placename + " - " + rows_select_reminder[i].latitude + "," + rows_select_reminder[i].longtitude);
+                                                
+                                                var split_start_date_list = rows_select_reminder[i].start_date.split("-");
+                                                var split_end_date_list = rows_select_reminder[i].end_date.split("-");
+                                                var split_start_time_list = rows_select_reminder[i].start_time.split(":");
+                                                var split_end_time_list = rows_select_reminder[i].end_time.split(":");
 
-                                        var list_taskname = null;
-                                        var list_location = null;
-                                        var list_start = null;
-                                        var list_end = null;
-                                    
-                                        var list_taskname_output = null;
-                                        var list_location_output = null;
-                                        var list_start_output = null;
-                                        var list_end_output = null;
+                                                if(split_start_date_list.length == 3 && split_end_date_list.length == 3 && split_start_time_list.length == 3 && split_end_time_list.length == 3) {
+                                                    var int_startyear = parseInt(split_start_date_list[0]) - 543;
+                                                    var int_startmonth = parseInt(split_start_date_list[1]) - 1;
+                                                    var int_startdate =  split_start_date_list[2];
 
-                                        var requestLocation = [true]
-                                        for (var i=0; i<rows_select_reminder.length; i++) {
-                                            requestLocation.push(new Promise(function(resolve,reject) {
-                                                var start_date = rows_select_reminder[i].start_date;
-                                                var split_start_date = start_date.split("-");
-                                                var int_start_year = split_start_date[0] - 543;
-                                                var int_start_month = split_start_date[1] - 1;
-                                                var int_start_date = split_start_date[2];
+                                                    var int_endyear = parseInt(split_end_date_list[0]) - 543;
+                                                    var int_endmonth = parseInt(split_end_date_list[1]) - 1;
+                                                    var int_enddate =  split_end_date_list[2];
 
-                                                var start_time = rows_select_reminder[i].start_time;
-                                                var split_start_time = start_time.split(":");
-                                                var int_start_hour = split_start_time[0];
-                                                var int_start_min = split_start_time[1];
+                                                    var int_starthour = split_start_time_list[0];
+                                                    var int_startmin = split_start_time_list[1];
 
-                                                var start_list = new Date(int_start_year, int_start_month, int_start_date, int_start_hour, int_start_min);
-                                                var start_list_msec = start_list.getTime();
+                                                    var int_endhour = split_end_time_list[0];
+                                                    var int_endmin = split_end_time_list[1];
 
-                                                var end_date = rows_select_reminder[i].end_date;
-                                                var split_end_date = end_date.split("-");
-                                                var int_end_year = split_end_date[0] - 543;
-                                                var int_end_month = split_end_date[1] - 1;
-                                                var int_end_date = split_end_date[2];
+                                                    var start_list = new Date(int_startyear, int_startmonth, int_startdate, int_starthour, int_startmin);
+                                                    var end_list = new Date(int_endyear, int_endmonth, int_enddate, int_endhour, int_endmin);
 
-                                                var end_time = rows_select_reminder[i].end_time;
-                                                var split_end_time = end_time.split(":");
-                                                var int_end_hour = split_end_time[0];
-                                                var int_end_min = split_end_time[1];
-
-                                                var end_list = new Date(int_end_year, int_end_month, int_end_date, int_end_hour, int_end_min);
-                                                var end_list_msec = end_list.getTime();
-                                                console.log("endlist : " + end_list.toDateString());
-                                                var longtitude_list, latitude_list = null
-                                                if(rows_select_reminder[i].longtitude && rows_select_reminder[i].latitude) {
-                                                    longtitude_list = rows_select_reminder[i].longtitude;
-                                                    latitude_list = rows_select_reminder[i].latitude;
-                                                }
-
-                                                list_taskname = rows_select_reminder[i].taskname;
-                                                list_location = rows_select_reminder[i].placename;
-                                                list_start = int_start_date + "/" + (int_start_month+1) + "/" + (int_start_year+543) + " " + int_start_hour + ":" + int_start_min;
-                                                list_end = int_end_date + "/" + (int_end_month+1) + "/" + (int_end_year+543) + " " + int_end_hour + ":" + int_end_min;
-                                                console.log("\n" + list_taskname + " " + list_location + " " + list_start + " " + list_end);
-
-                                                if(start.getTime() >= start_list_msec && start.getTime() <= end_list_msec) {
-                                                    list_taskname_output = list_taskname;
-                                                    list_location_output = list_location;
-                                                    list_start_output = list_start;
-                                                    list_end_output = list_end;
-                                                    resolve(false)
-                                                    //resolve(true)
-                                                    // check = false;
-                                                    console.log("false : start_list");
-                                                }else if(end.getTime() >= start_list_msec && end.getTime() <= end_list_msec) {
-                                                    list_taskname_output = list_taskname;
-                                                    list_location_output = list_location;
-                                                    list_start_output = list_start;
-                                                    list_end_output = list_end;
-                                                    resolve(false)
-                                                    //resolve(true)
-                                                    // check = false;
-                                                    console.log("false : end_list");
-                                                }else {
-                                                    console.log("Check\nlongtitude : " + longtitude_list + " - " + longtitude + "\nlatitude : " + latitude_list + " - " + latitude);
-                                                    if (longtitude_list != null && latitude_list != null && longtitude != null && latitude != null) {
-                                                        var api = "AIzaSyBqen24A8jnMVNYz5FTA-Fl4Hry0ocktLQ"
-                                                        var callapi = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
-                                                        var origins = "origins=" + latitude_list + "," + longtitude_list + "&";
-                                                        var destinations = "destinations=" + latitude + "," + longtitude + "&";
-                                                        var mode_arrive = "mode=driving&departure_time=" +  end_list_msec + "&traffic_model=optimistic&";
-                                                        var API_KEY = "key=" + api;
-                                                        var url = callapi + origins + destinations + mode_arrive + API_KEY;
-
-                                                        request(url, function(error, response, body) {
-                                                            // console.log(typeof(body));
-                                                            var data = JSON.parse(body);
-                                                            if(data.status == "OK") {
-                                                                // console.log(" - Destination : " + data.destination_addresses);
-                                                                // console.log(" - Origin : " + data.origin_addresses);
-
-                                                                console.log("Distance : " + data.rows[0].elements[0].distance.text);
-                                                                console.log("Time : " + data.rows[0].elements[0].duration_in_traffic.text);
-                                                                
-                                                                if(start.getTime() < start_list_msec && end.getTime() < start_list_msec) {
-                                                                    console.log("Before list");
-                                                                    var traffic = start_list_msec - count_traffic_milliseconds(data.rows[0].elements[0].duration_in_traffic.text);
-                                                                    var traffic_date = new Date(traffic);
-                                                                    console.log("traffic date : " + traffic_date.toLocaleDateString() + " traffic time : " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
-                                                                    console.log(end.toLocaleDateString() + " " + end.toLocaleTimeString() + " " + end.getTime());
-                                                                    if(traffic_date.getTime() < end.getTime()) {
-                                                                        count_distance_traffic = data.rows[0].elements[0].distance.text;
-                                                                        count_time_traffic = data.rows[0].elements[0].duration_in_traffic.text;
-
-                                                                        list_taskname_output = list_taskname;
-                                                                        list_location_output = list_location;
-                                                                        list_start_output = list_start;
-                                                                        list_end_output = list_end;
-                                                                        reject(false);
-                                                                    }
-                                                                    resolve(false)
-                                                                }else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
-                                                                    console.log("After list");
-                                                                    var traffic = end_list_msec + count_traffic_milliseconds(data.rows[0].elements[0].duration_in_traffic.text);
-                                                                    var traffic_date = new Date(traffic);
-                                                                    console.log("traffic date : " + traffic_date.toLocaleDateString() + " traffic time : " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
-                                                                    console.log(start.toLocaleDateString() + " " + start.toLocaleTimeString() + " " + start.getTime());
-                                                                    console.log(end.toLocaleDateString() + " " + end.toLocaleTimeString() + " " + end.getTime());
-                                                                    if(traffic_date.getTime() > start.getTime() && traffic_date < end.getTime()) {
-                                                                        console.log("check traffic");
-                                                                        count_distance_traffic = data.rows[0].elements[0].distance.text;
-                                                                        count_time_traffic = data.rows[0].elements[0].duration_in_traffic.text;
-
-                                                                        list_taskname_output = list_taskname;
-                                                                        list_location_output = list_location;
-                                                                        list_start_output = list_start;
-                                                                        list_end_output = list_end;
-                                                                        reject(false);
-                                                                    }else {
-                                                                        resolve(false);
-                                                                    }
-                                                                }
-                                                            }else {
-                                                                list_taskname_output = list_taskname;
-                                                                list_location_output = list_location;
-                                                                list_start_output = list_start;
-                                                                list_end_output = list_end;
-                                                                reject(false);
-                                                            }
-                                                        });
+                                                    if(start_list.getTime() < start.getTime() && start.getTime() < end_list.getTime()) {
+                                                        check = false;
+                                                        index_reject.push(i);
+                                                    }else if(start_list.getTime() < end.getTime() && end.getTime() < end_list.getTime()) {
+                                                        check = false;
+                                                        index_reject.push(i);
                                                     }else {
-                                                        if(start.getTime() < start_list_msec && end.getTime() < start_list_msec) {
-                                                            console.log("min");
-                                                            if(longtitude_list == null || latitude_list == null || longtitude == null || latitude != null) {
-                                                                resolve(true)
-                                                            }else {
-                                                                list_taskname_output = list_taskname;
-                                                                list_location_output = list_location;
-                                                                list_start_output = list_start;
-                                                                list_end_output = list_end;
-                                                                reject(true);
-                                                            }
-                                                        } else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
-                                                            console.log("max");
-                                                            if(longtitude_list == null || latitude_list == null || longtitude == null || latitude != null) {
-                                                                resolve(true)
-                                                            }else {
-                                                                list_taskname_output = list_taskname;
-                                                                list_location_output = list_location;
-                                                                list_start_output = list_start;
-                                                                list_end_output = list_end;
-                                                                reject(true);
-                                                            }
-                                                        } else {
-                                                            console.log("reject");
-                                                            resolve(false)
-                                                        }
+                                                        index.push(i);
                                                     }
                                                 }
-                                            }))
-                                        }
-                                        Promise.all(requestLocation)
-                                            .then(function(check) {
-                                                console.log("then : " + check);
-                                                if(!check.includes(false)) {
-                                                    connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
-                                                        if(err) {
-                                                            res.send({
-                                                                status: 400,
-                                                                msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
-                                                            });
-                                                        }else {
-                                                            console.log("Reminder_id : " + rows.insertId);
-                                                            reminder_id = rows.insertId;
-                                                            if(
-                                                                notification_datetime.before_after
-                                                                && notification_datetime.num_notification
-                                                                && notification_datetime.type_num
-                                                            ){
-                                                                var num = parseInt(notification_datetime.num_notification);
-                                                    
-                                                                var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
-                                                    
-                                                                if(notification_date != null) {
-                                                                    var time_notification_table = notification_date.toLocaleTimeString();
-                                                                    var date_notification_table = notification_date.toLocaleDateString();
+                                            }
+                                            if(check == true){
+                                                var check_place = true;
+                                                for (var i=0; i<index.length; i++) {
+                                                    if(latitude != null && longtitude != null && rows_select_reminder[i].latitude != null && rows_select_reminder[i].longtitude != null) {
                                                         
-                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type, placename) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num + '" , "' + reminder_event.placename + '")', function(err, rows) {
-                                                                        if(err) {
-                                                                            res.send({
-                                                                                status: 400,
-                                                                                msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
-                                                                            });
+                                                    }else {
+                                                        check_place = false;
+                                                        connection.query(`INSERT INTO reminder(user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES` + `('` + id + `', 'Event', '0', '` + startdate + `' , '` + enddate + `' , '` + starttime + `' , '` + endtime + `' , '` + reminder_event.placename + `' , '` + latitude + `' , '` + longtitude + `' , '` + reminder_event.taskname + `' , '0');`, function(err, rows_insert_reminder) {
+                                                            if(err) {
+                                                                res.send({
+                                                                    status: 400,
+                                                                    msg: 'addreminder/event : allday = 0 : there are some error with query insert reminder'
+                                                                });
+                                                            }else {
+                                                                res.send({
+                                                                    status: 200,
+                                                                    msg: 'addreminder/event : allday = 0 : can add event when reminder_event.length = 0'
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                                if(check_place == true) {
+                                                    var index_request = [];
+                                                    var requestLocation = []
+                                                    var check_request = true;
+                                                    for (var i=0; i<rows_select_reminder.length; i++) {
+                                                        index_request.push(i);
+                                                    }
+                                                    for(var i=0; i<index.length; i++) {
+                                                        requestLocation.push(new Promise(function(resolve,reject) {
+                                                            var num = index[i];
+                                                            console.log("true");
+                                                            console.log(latitude + "," + longtitude);
+                                                            console.log(rows_select_reminder[i].latitude + "," + rows_select_reminder[i].longtitude)
+                                                            var api = "AIzaSyBqen24A8jnMVNYz5FTA-Fl4Hry0ocktLQ"
+                                                            var callapi = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
+                                                            var origins = "origins=" + latitude + "," + longtitude + "&";
+                                                            var destinations = "destinations=" + rows_select_reminder[i].latitude + "," + rows_select_reminder[i].longtitude + "&";
+                                                            var API_KEY = "key=" + api;
+                                                            var url = callapi + origins + destinations + API_KEY;
+                                                            request(url, function(error, response, body) {
+                                                                var data = JSON.parse(body);
+                                                                console.log(data.rows[0].elements[0].distance.text);
+                                                                console.log(data.rows[0].elements[0].duration.text);
+                                                                console.log(rows_select_reminder[num].placename);
+
+                                                                var split_start_date_list = rows_select_reminder[num].start_date.split("-");
+                                                                var split_end_date_list = rows_select_reminder[num].end_date.split("-");
+                                                                var split_start_time_list = rows_select_reminder[num].start_time.split(":");
+                                                                var split_end_time_list = rows_select_reminder[num].end_time.split(":");
+
+                                                                if(split_start_date_list.length == 3 && split_end_date_list.length == 3 && split_start_time_list.length == 3 && split_end_time_list.length == 3) {
+                                                                    var int_startyear = parseInt(split_start_date_list[0]) - 543;
+                                                                    var int_startmonth = parseInt(split_start_date_list[1]) - 1;
+                                                                    var int_startdate =  split_start_date_list[2];
+                
+                                                                    var int_endyear = parseInt(split_end_date_list[0]) - 543;
+                                                                    var int_endmonth = parseInt(split_end_date_list[1]) - 1;
+                                                                    var int_enddate =  split_end_date_list[2];
+                
+                                                                    var int_starthour = split_start_time_list[0];
+                                                                    var int_startmin = split_start_time_list[1];
+                
+                                                                    var int_endhour = split_end_time_list[0];
+                                                                    var int_endmin = split_end_time_list[1];
+                
+                                                                    var start_list = new Date(int_startyear, int_startmonth, int_startdate, int_starthour, int_startmin);
+                                                                    var end_list = new Date(int_endyear, int_endmonth, int_enddate, int_endhour, int_endmin);
+                                                                    
+                                                                    // console.log(start.getTime() + " - " + start_list.getTime());
+                                                                    // console.log(end.getTime() + " - " + end_list.getTime());
+
+                                                                    if(start.getTime() < start_list.getTime() && end.getTime() < start_list.getTime()) {
+                                                                        console.log("less");
+                                                                        var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
+                                                                        var traffic_time_sec = start_list.getTime() - msec;
+                                                                        console.log("Traffice : " + traffic_time_sec + " - " + end.getTime());
+                                                                        if(traffic_time_sec < end.getTime()) {
+                                                                            console.log("reject");
+                                                                            reject(false);
                                                                         }else {
-                                                                            res.send({
-                                                                                status: 200,
-                                                                                msg: 'addreminder/event : allday = 0 : insert notification complete'
-                                                                            });
+                                                                            console.log("resolve");
+                                                                            resolve(true);
                                                                         }
+                                                                    }else if(start.getTime() > end_list.getTime() && end.getTime() > end_list.getTime()) {
+                                                                        console.log("more");
+                                                                        var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
+                                                                        var traffic_time_sec = end_list.getTime() + msec;
+                                                                        console.log("Traffice : " + traffic_time_sec + " - " + start.getTime());
+                                                                        if(traffic_time_sec > start.getTime()) {
+                                                                            console.log("reject");
+                                                                            reject(false);
+                                                                        }else {
+                                                                            console.log("resolve");
+                                                                            resolve(true);
+                                                                        }
+                                                                    }else {
+                                                                        console.log("else in request");
+                                                                        resolve(true);
+                                                                    }
+                                                                }
+                                                            });
+                                                        }))
+                                                    }
+                                                    Promise.all(requestLocation)
+                                                        .then(function(check) {
+                                                            console.log("then : " + check);
+                                                            connection.query(`INSERT INTO reminder(user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES` + `('` + id + `', 'Event', '0', '` + startdate + `' , '` + enddate + `' , '` + starttime + `' , '` + endtime + `' , '` + reminder_event.placename + `' , '` + latitude + `' , '` + longtitude + `' , '` + reminder_event.taskname + `' , '0');`, function(err, rows_insert_reminder) {
+                                                                if(err) {
+                                                                    res.send({
+                                                                        status: 400,
+                                                                        msg: 'addreminder/event : allday = 0 : there are some error with query insert reminder'
                                                                     });
                                                                 }else {
                                                                     res.send({
                                                                         status: 200,
-                                                                        msg: 'addreminder/event : allday = 0 : complete'
+                                                                        msg: 'addreminder/event : allday = 0 : can add event when then loop'
                                                                     });
                                                                 }
-                                                            }else {
-                                                                res.send({
-                                                                    status: 200,
-                                                                    msg: 'addreminder/event : allday = 0 : complete'
-                                                                });
-                                                            }
-                                                        }
-                                                    });
-                                                }else {
-                                                    res.send({
-                                                        status: 400,
-                                                        data: {
-                                                            distance: count_distance_traffic,
-                                                            time: count_time_traffic,
-                                                            list_location: list_location_output,
-                                                            list_start: list_start_output,
-                                                            list_end: list_end_output,
-                                                            list_taskname: list_taskname_output
-                                                        },
-                                                        check: check,
-                                                        msg: 'addreminder/event : allday = 0 : then cannot add this event'
-                                                    });
-                                                }
-                                            })
-                                            .catch(function(error) {
-                                                console.log("catch : " + check); 
-                                                if(check.includes(false)) {
-                                                    res.send({
-                                                        status: 400,
-                                                        data: {
-                                                            distance: count_distance_traffic,
-                                                            time: count_time_traffic,
-                                                            list_location: list_location_output,
-                                                            list_start: list_start_output,
-                                                            list_end: list_end_output,
-                                                            list_taskname: list_taskname_output
-                                                        },
-                                                        check: check,
-                                                        msg: 'addreminder/event : allday = 0 : catch cannot add this event'
-                                                    });
-                                                }else {
-                                                    connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){
-                                                        if(err) {
-                                                            res.send({
-                                                                status: 400,
-                                                                msg: 'addreminder/event : allday = 0 : there are some error with query select add event'
                                                             });
-                                                        }else {
-                                                            console.log("Reminder_id : " + rows.insertId);
-                                                            reminder_id = rows.insertId;
-                                                            if(
-                                                                notification_datetime.before_after
-                                                                && notification_datetime.num_notification
-                                                                && notification_datetime.type_num
-                                                            ){
-                                                                var num = parseInt(notification_datetime.num_notification);
-                                                    
-                                                                var notification_date = count_milliseconds(start, end, notification_datetime.before_after, num, notification_datetime.type_num);
-                                                    
-                                                                if(notification_date != null) {
-                                                                    var time_notification_table = notification_date.toLocaleTimeString();
-                                                                    var date_notification_table = notification_date.toLocaleDateString();
-                                                        
-                                                                    connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + notification_datetime.before_after + '" , "' + num + '" , "' + notification_datetime.type_num +'")', function(err, rows) {
-                                                                        if(err) {
-                                                                            res.send({
-                                                                                status: 400,
-                                                                                msg: 'addreminder/event : allday = 0 : there are some error with insert notification'
-                                                                            });
-                                                                        }else {
-                                                                            res.send({
-                                                                                status: 200,
-                                                                                msg: 'addreminder/event : allday = 0 : insert notification complete'
-                                                                            });
-                                                                        }
-                                                                    });
-                                                                }else {
-                                                                    res.send({
-                                                                        status: 200,
-                                                                        msg: 'addreminder/event : allday = 0 : complete'
-                                                                    });
-                                                                }
-                                                            }else {
-                                                                res.send({
-                                                                    status: 200,
-                                                                    msg: 'addreminder/event : allday = 0 : complete'
-                                                                });
-                                                            }
-                                                        }
+                                                        })
+                                                        .catch(function(error) {
+                                                            console.log("catach : " + check);
+                                                            res.send({
+                                                                status: 200,
+                                                                msg: 'addreminder/event : allday = 0 : catach complete'
+                                                            });
+                                                        })
+                                                }
+                                            }else {
+                                                console.log(index_reject);
+                                                var reminder = rows_select_reminder.filter(function(element,index){
+                                                    if( index_reject.findIndex(function(e){ return e == index }) > -1 ){
+                                                        return true;
+                                                    }
+                                                    else {
+                                                        return false;
+                                                    }
+                                                });
+                                                res.send({
+                                                    status: 400,
+                                                    data: reminder,
+                                                    msg: 'addreminder/event : allday = 0 : warnning time'
+                                                });
+                                            }
+                                        }else {
+                                            connection.query(`INSERT INTO reminder(user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES` + `('` + id + `', 'Event', '0', '` + startdate + `' , '` + enddate + `' , '` + starttime + `' , '` + endtime + `' , '` + reminder_event.placename + `' , '` + latitude + `' , '` + longtitude + `' , '` + reminder_event.taskname + `' , '0');`, function(err, rows_insert_reminder) {
+                                                if(err) {
+                                                    res.send({
+                                                        status: 400,
+                                                        msg: 'addreminder/event : allday = 0 : there are some error with query insert reminder'
+                                                    });
+                                                }else {
+                                                    res.send({
+                                                        status: 200,
+                                                        msg: 'addreminder/event : allday = 0 : can add event when reminder_event.length = 0'
                                                     });
                                                 }
-                                                
                                             });
+                                        }
                                     }
                                 });
                             }else {
@@ -752,6 +644,7 @@ router.post('/event', (req,res) => {
                     }
                 }else {
                     res.send({
+                        status: 400,
                         msg: 'addreminder/event : this token dont have user'
                     });
                 }
@@ -759,6 +652,7 @@ router.post('/event', (req,res) => {
         });
     }else {
         res.send({
+            status: 400,
             msg: 'addreminder event : date not enough'
         });
     }
