@@ -425,7 +425,7 @@ router.post('/event', (req,res) => {
                                                     // check = false;
                                                     console.log("false : end_list");
                                                 }else {
-                                                    console.log("Place check : " + longtitude_list + " " + latitude_list + " " + longtitude + " " + latitude + " - Check time : " + end_list_msec);
+                                                    console.log("Check\nlongtitude : " + longtitude_list + " - " + longtitude + "\nlatitude : " + latitude_list + " - " + latitude);
                                                     if (longtitude_list != null && latitude_list != null && longtitude != null && latitude != null) {
                                                         var api = "AIzaSyBqen24A8jnMVNYz5FTA-Fl4Hry0ocktLQ"
                                                         var callapi = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
@@ -438,17 +438,9 @@ router.post('/event', (req,res) => {
                                                         request(url, function(error, response, body) {
                                                             // console.log(typeof(body));
                                                             var data = JSON.parse(body);
-                                                            if(data.status == "INVALID_REQUEST") {
-                                                                list_taskname_output = list_taskname;
-                                                                list_location_output = list_location;
-                                                                list_start_output = list_start;
-                                                                list_end_output = list_end;
-                                                                reject(false);
-                                                                //resolve(true)
-                                                                // check = false;
-                                                            }else {
-                                                                console.log(" - Destination : " + data.destination_addresses);
-                                                                console.log(" - Origin : " + data.origin_addresses);
+                                                            if(data.status == "OK") {
+                                                                // console.log(" - Destination : " + data.destination_addresses);
+                                                                // console.log(" - Origin : " + data.origin_addresses);
 
                                                                 console.log("Distance : " + data.rows[0].elements[0].distance.text);
                                                                 console.log("Time : " + data.rows[0].elements[0].duration_in_traffic.text);
@@ -468,8 +460,6 @@ router.post('/event', (req,res) => {
                                                                         list_start_output = list_start;
                                                                         list_end_output = list_end;
                                                                         reject(false);
-                                                                        ///resolve(true)
-                                                                        // check = false;
                                                                     }
                                                                     resolve(false)
                                                                 }else if(start.getTime() > end_list_msec && end.getTime() > end_list_msec) {
@@ -478,7 +468,9 @@ router.post('/event', (req,res) => {
                                                                     var traffic_date = new Date(traffic);
                                                                     console.log("traffic date : " + traffic_date.toLocaleDateString() + " traffic time : " + traffic_date.toLocaleTimeString() +  " " + traffic_date.getTime());
                                                                     console.log(start.toLocaleDateString() + " " + start.toLocaleTimeString() + " " + start.getTime());
-                                                                    if(traffic_date.getTime() > start.getTime()) {
+                                                                    console.log(end.toLocaleDateString() + " " + end.toLocaleTimeString() + " " + end.getTime());
+                                                                    if(traffic_date.getTime() > start.getTime() && traffic_date < end.getTime()) {
+                                                                        console.log("check traffic");
                                                                         count_distance_traffic = data.rows[0].elements[0].distance.text;
                                                                         count_time_traffic = data.rows[0].elements[0].duration_in_traffic.text;
 
@@ -487,11 +479,16 @@ router.post('/event', (req,res) => {
                                                                         list_start_output = list_start;
                                                                         list_end_output = list_end;
                                                                         reject(false);
-                                                                        ///resolve(true)
-                                                                        // check = false;
+                                                                    }else {
+                                                                        resolve(false);
                                                                     }
-                                                                    resolve(false)
                                                                 }
+                                                            }else {
+                                                                list_taskname_output = list_taskname;
+                                                                list_location_output = list_location;
+                                                                list_start_output = list_start;
+                                                                list_end_output = list_end;
+                                                                reject(false);
                                                             }
                                                         });
                                                     }else {
@@ -521,8 +518,6 @@ router.post('/event', (req,res) => {
                                                             console.log("reject");
                                                             resolve(false)
                                                         }
-                                                        // reject(true)
-                                                        /// reject(false)
                                                     }
                                                 }
                                             }))
@@ -592,13 +587,13 @@ router.post('/event', (req,res) => {
                                                             list_taskname: list_taskname_output
                                                         },
                                                         check: check,
-                                                        msg: 'addreminder/event : allday = 0 : cannot add this event'
+                                                        msg: 'addreminder/event : allday = 0 : then cannot add this event'
                                                     });
                                                 }
                                             })
                                             .catch(function(error) {
                                                 console.log("catch : " + check); 
-                                                if(check == true) {
+                                                if(check.includes(false)) {
                                                     res.send({
                                                         status: 400,
                                                         data: {
@@ -610,7 +605,7 @@ router.post('/event', (req,res) => {
                                                             list_taskname: list_taskname_output
                                                         },
                                                         check: check,
-                                                        msg: 'addreminder/event : allday = 0 : cannot add this event'
+                                                        msg: 'addreminder/event : allday = 0 : catch cannot add this event'
                                                     });
                                                 }else {
                                                     connection.query('INSERT INTO reminder (user_id, type, allday, start_date, end_date, start_time, end_time, placename, latitude, longtitude, taskname, complete) VALUES ("' + id + '", "' + reminder_event.type + '", "0", "'  + startdate + '", "' + enddate + '", "' + starttime + '", "' + endtime + '", "' + reminder_event.placename + '", "' + latitude + '", "' + longtitude + '", "' + reminder_event.taskname + '", "' + reminder_event.complete +'")', function(err,rows){

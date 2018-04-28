@@ -39,8 +39,8 @@ router.post('/notification', (req,res) => {
         input_latitude
         && input_longtitude
     ){
-        console.log("latitude : " + input_latitude);
-        console.log("longtitude : " + input_longtitude + "\n");
+        console.log("latitude checklocation_reminder : " + input_latitude);
+        console.log("longtitude checklocation_reminder : " + input_longtitude + "\n");
         connection.query(`SELECT * FROM user WHERE token = ?`, [token], function(err,rows_user) {
             if(err) {
                 res.send({
@@ -92,7 +92,7 @@ router.post('/notification', (req,res) => {
                                                         var split_distance = str_distance.split(" ");
                                                         var float_distance = parseFloat(split_distance[0]);
                                                         //unit kilometer for notification
-                                                        if(float_distance < 0) {
+                                                        if(float_distance < 5) {
                                                             taskname = rows_notification[num].taskname;
                                                             subtaskname = " : " + rows_notification[num].subtaskname;
                                                             str_taskname_subtaskname = taskname + subtaskname;
@@ -111,7 +111,7 @@ router.post('/notification', (req,res) => {
                                         }
                                         Promise.all(requestLocation)
                                             .then(function(check) {
-                                                console.log(check);
+                                                console.log("then : " + check);
                                                 if(check.includes(true)) {
                                                     console.log("output : " + array_taskname_subtaskname);
                                                     res.send({
@@ -127,6 +127,7 @@ router.post('/notification', (req,res) => {
                                                 }
                                             })
                                             .catch(function(error) {
+                                                console.log("catach : " + check);
                                                 res.send({
                                                     status: 200,
                                                     msg: 'checklocation/notification : complete'
@@ -141,7 +142,7 @@ router.post('/notification', (req,res) => {
                                 }
                             }else {
                                 res.send({
-                                    status: 200,
+                                    status: 400,
                                     msg: 'checklocation/notification : rows_notification <= 0'
                                 });
                             }

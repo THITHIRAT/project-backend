@@ -57,6 +57,9 @@ app.use('/checktime', checktime);
 var checklocation = require('./route/checklocation.js');
 app.use('/checklocation', checklocation);
 
+var checklocation_forlocation = require('./route/checklocation_forlocation.js');
+app.use('/checklocation_forlocation', checklocation_forlocation);
+
 app.get('/', function(req,res) {
     res.send('Welcome to my API');
 });
