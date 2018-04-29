@@ -67,7 +67,8 @@ router.post('/notification', (req,res) => {
                                         
                                         request(url, function(error, response, body) {
                                             var data = JSON.parse(body);
-                                            if(data.rows[0].elements[0].status == 'OK'){
+                                            // console.log(data);
+                                            if(data.status == 'OK'){
                                                 console.log(data.rows[0].elements[0].distance.text);
                                                 var str_distance = data.rows[0].elements[0].distance.text;
                                                 var split_distance = str_distance.split(" ");
@@ -108,7 +109,7 @@ router.post('/notification', (req,res) => {
                                                     resolve(false);
                                                 }
                                             }else {
-                                                console.log(data.rows[0].elements[0].status);
+                                                console.log(data.status);
                                                 resolve(false);
                                             }
                                         });

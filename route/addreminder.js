@@ -513,14 +513,15 @@ router.post('/event', (req,res) => {
                                                                         && req.body.num_notification
                                                                         && req.body.type_num
                                                                     ){
-                                                                        var num = parseInt(req.body.num_notification_1);
+                                                                        var num = parseInt(req.body.num_notification);
                                         
-                                                                        var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
+                                                                        var notification_date = count_milliseconds(start, end, req.body.before_after, num, req.body.type_num);
                                         
                                                                         var time_notification_table = notification_date.toLocaleTimeString();
                                                                         var date_notification_table = notification_date.toLocaleDateString();
                                         
-                                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
+                                                                        var reminder_id = rows_insert_reminder.insertId;
+                                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after + '" , "' + num + '" , "' + req.body.type_num +'")', function(err, rows) {
                                                                             if(err) {
                                                                                 res.send({
                                                                                     status: 400,
@@ -584,14 +585,15 @@ router.post('/event', (req,res) => {
                                                         && req.body.num_notification
                                                         && req.body.type_num
                                                     ){
-                                                        var num = parseInt(req.body.num_notification_1);
+                                                        var num = parseInt(req.body.num_notification);
                         
-                                                        var notification_date = count_milliseconds(start, end, req.body.before_after_1, num, req.body.type_num_1);
+                                                        var notification_date = count_milliseconds(start, end, req.body.before_after, num, req.body.type_num);
                         
                                                         var time_notification_table = notification_date.toLocaleTimeString();
                                                         var date_notification_table = notification_date.toLocaleDateString();
                         
-                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after_1 + '" , "' + num + '" , "' + req.body.type_num_1 +'")', function(err, rows) {
+                                                        var reminder_id = rows_insert_reminder.insertId;
+                                                        connection.query('INSERT INTO notification (reminder_id, time, date, before_after, number, type) VALUES ("' + reminder_id + '", "' + time_notification_table + '" , "' + date_notification_table + '" , "' + req.body.before_after + '" , "' + num + '" , "' + req.body.type_num +'")', function(err, rows) {
                                                             if(err) {
                                                                 res.send({
                                                                     status: 400,
