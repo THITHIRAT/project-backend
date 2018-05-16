@@ -434,7 +434,7 @@ router.post('/event', (req,res) => {
                                                             var url = callapi + origins + destinations + API_KEY;
                                                             request(url, function(error, response, body) {
                                                                 var data = JSON.parse(body);
-                                                                if (data.row[0].elements[0].distance) {
+                                                                if(data.status == 'OK'){
                                                                     console.log(data.rows[0].elements[0].distance.text);
                                                                     console.log(data.rows[0].elements[0].duration.text);
                                                                     console.log(rows_select_reminder[num].placename);
