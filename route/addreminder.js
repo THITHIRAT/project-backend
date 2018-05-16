@@ -434,65 +434,67 @@ router.post('/event', (req,res) => {
                                                             var url = callapi + origins + destinations + API_KEY;
                                                             request(url, function(error, response, body) {
                                                                 var data = JSON.parse(body);
-                                                                console.log(data.rows[0].elements[0].distance.text);
-                                                                console.log(data.rows[0].elements[0].duration.text);
-                                                                console.log(rows_select_reminder[num].placename);
-
-                                                                var split_start_date_list = rows_select_reminder[num].start_date.split("-");
-                                                                var split_end_date_list = rows_select_reminder[num].end_date.split("-");
-                                                                var split_start_time_list = rows_select_reminder[num].start_time.split(":");
-                                                                var split_end_time_list = rows_select_reminder[num].end_time.split(":");
-
-                                                                if(split_start_date_list.length == 3 && split_end_date_list.length == 3 && split_start_time_list.length == 3 && split_end_time_list.length == 3) {
-                                                                    var int_startyear = parseInt(split_start_date_list[0]) - 543;
-                                                                    var int_startmonth = parseInt(split_start_date_list[1]) - 1;
-                                                                    var int_startdate =  split_start_date_list[2];
-                
-                                                                    var int_endyear = parseInt(split_end_date_list[0]) - 543;
-                                                                    var int_endmonth = parseInt(split_end_date_list[1]) - 1;
-                                                                    var int_enddate =  split_end_date_list[2];
-                
-                                                                    var int_starthour = split_start_time_list[0];
-                                                                    var int_startmin = split_start_time_list[1];
-                
-                                                                    var int_endhour = split_end_time_list[0];
-                                                                    var int_endmin = split_end_time_list[1];
-                
-                                                                    var start_list = new Date(int_startyear, int_startmonth, int_startdate, int_starthour, int_startmin);
-                                                                    var end_list = new Date(int_endyear, int_endmonth, int_enddate, int_endhour, int_endmin);
-                                                                    
-                                                                    // console.log(start.getTime() + " - " + start_list.getTime());
-                                                                    // console.log(end.getTime() + " - " + end_list.getTime());
-
-                                                                    if(start.getTime() <= start_list.getTime() && end.getTime() <= start_list.getTime()) {
-                                                                        console.log("less");
-                                                                        var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
-                                                                        var traffic_time_sec = start_list.getTime() - msec;
-                                                                        console.log("Traffice : " + traffic_time_sec + " - " + end.getTime());
-                                                                        if(traffic_time_sec < end.getTime()) {
-                                                                            console.log("reject");
-                                                                            index_noti.push(num);
-                                                                            reject(false);
+                                                                if (data.row[0].elements[0].distance) {
+                                                                    console.log(data.rows[0].elements[0].distance.text);
+                                                                    console.log(data.rows[0].elements[0].duration.text);
+                                                                    console.log(rows_select_reminder[num].placename);
+    
+                                                                    var split_start_date_list = rows_select_reminder[num].start_date.split("-");
+                                                                    var split_end_date_list = rows_select_reminder[num].end_date.split("-");
+                                                                    var split_start_time_list = rows_select_reminder[num].start_time.split(":");
+                                                                    var split_end_time_list = rows_select_reminder[num].end_time.split(":");
+    
+                                                                    if(split_start_date_list.length == 3 && split_end_date_list.length == 3 && split_start_time_list.length == 3 && split_end_time_list.length == 3) {
+                                                                        var int_startyear = parseInt(split_start_date_list[0]) - 543;
+                                                                        var int_startmonth = parseInt(split_start_date_list[1]) - 1;
+                                                                        var int_startdate =  split_start_date_list[2];
+                    
+                                                                        var int_endyear = parseInt(split_end_date_list[0]) - 543;
+                                                                        var int_endmonth = parseInt(split_end_date_list[1]) - 1;
+                                                                        var int_enddate =  split_end_date_list[2];
+                    
+                                                                        var int_starthour = split_start_time_list[0];
+                                                                        var int_startmin = split_start_time_list[1];
+                    
+                                                                        var int_endhour = split_end_time_list[0];
+                                                                        var int_endmin = split_end_time_list[1];
+                    
+                                                                        var start_list = new Date(int_startyear, int_startmonth, int_startdate, int_starthour, int_startmin);
+                                                                        var end_list = new Date(int_endyear, int_endmonth, int_enddate, int_endhour, int_endmin);
+                                                                        
+                                                                        // console.log(start.getTime() + " - " + start_list.getTime());
+                                                                        // console.log(end.getTime() + " - " + end_list.getTime());
+    
+                                                                        if(start.getTime() <= start_list.getTime() && end.getTime() <= start_list.getTime()) {
+                                                                            console.log("less");
+                                                                            var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
+                                                                            var traffic_time_sec = start_list.getTime() - msec;
+                                                                            console.log("Traffic     : " + traffic_time_sec + " - " + end.getTime());
+                                                                            if(traffic_time_sec < end.getTime()) {
+                                                                                console.log("reject");
+                                                                                index_noti.push(num);
+                                                                                reject(false);
+                                                                            }else {
+                                                                                console.log("resolve");
+                                                                                resolve(true);
+                                                                            }
+                                                                        }else if(start.getTime() >= end_list.getTime() && end.getTime() >= end_list.getTime()) {
+                                                                            console.log("more");
+                                                                            var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
+                                                                            var traffic_time_sec = end_list.getTime() + msec;
+                                                                            console.log("Traffic : " + traffic_time_sec + " - " + start.getTime());
+                                                                            if(traffic_time_sec > start.getTime()) {
+                                                                                console.log("reject");
+                                                                                index_noti.push(num);
+                                                                                reject(false);
+                                                                            }else {
+                                                                                console.log("resolve");
+                                                                                resolve(true);
+                                                                            }
                                                                         }else {
-                                                                            console.log("resolve");
+                                                                            console.log("else in request");
                                                                             resolve(true);
                                                                         }
-                                                                    }else if(start.getTime() >= end_list.getTime() && end.getTime() >= end_list.getTime()) {
-                                                                        console.log("more");
-                                                                        var msec = count_traffic_milliseconds(data.rows[0].elements[0].duration.text);
-                                                                        var traffic_time_sec = end_list.getTime() + msec;
-                                                                        console.log("Traffic : " + traffic_time_sec + " - " + start.getTime());
-                                                                        if(traffic_time_sec > start.getTime()) {
-                                                                            console.log("reject");
-                                                                            index_noti.push(num);
-                                                                            reject(false);
-                                                                        }else {
-                                                                            console.log("resolve");
-                                                                            resolve(true);
-                                                                        }
-                                                                    }else {
-                                                                        console.log("else in request");
-                                                                        resolve(true);
                                                                     }
                                                                 }
                                                             });
